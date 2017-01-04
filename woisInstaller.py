@@ -5,18 +5,18 @@
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
 ***************************************************************************
-* This installer is part of the Water Observation Information System (WOIS)  *
+* This installer is part of the Water Observation Information System (GWA Toolbox)  *
 * developed under the TIGER-NET project funded by the European Space      *
 * Agency as part of the long-term TIGER initiative aiming at promoting    *
 * the use of Earth Observation (EO) for improved Integrated Water         *
 * Resources Management (IWRM) in Africa.                                  *
 *                                                                         *
-* WOIS is a free software i.e. you can redistribute it and/or modify      *
+* GWA Toolbox is a free software i.e. you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published       *
 * by the Free Software Foundation, either version 3 of the License,       *
 * or (at your option) any later version.                                  *
 *                                                                         *
-* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY *
+* GWA Toolbox is distributed in the hope that it will be useful, but WITHOUT ANY *
 * WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
 * for more details.                                                       *
@@ -137,7 +137,7 @@ class woisInstaller():
         if res == NEXT:
             # pip installations
             dirPath = str(self.dialog.dirPathText.toPlainText())
-            pipbat = os.path.join("QGIS WOIS plugins", 'pip_installs', 'install_pip_packages.bat')
+            pipbat = os.path.join("QGIS GWA Toolbox plugins", 'pip_installs', 'install_pip_packages.bat')
             if installer_utils.check_file_exists(pipbat):
                 cmd = [pipbat, dirPath]
                 # show dialog because it might take some time on slower computers
@@ -145,7 +145,7 @@ class woisInstaller():
                 self.showDialog()
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"),".qgis2","python")
-            srcPath = os.path.join("QGIS WOIS plugins", "plugins.zip")
+            srcPath = os.path.join("QGIS GWA Toolbox plugins", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
                 'processing',
@@ -165,7 +165,7 @@ class woisInstaller():
             self.showDialog()
             # copy scripts and models
             dstPath = os.path.join(os.path.expanduser("~"),".qgis2","processing")
-            srcPath = os.path.join("QGIS WOIS plugins", "scripts_and_models.zip")
+            srcPath = os.path.join("QGIS GWA Toolbox plugins", "scripts_and_models.zip")
             # show dialog because it might take some time on slower computers
             self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
@@ -645,13 +645,13 @@ class Utilities(QtCore.QObject):
                 "Processing/configuration/ACTIVATE_SAGA",
                 "Processing/configuration/ACTIVATE_SCRIPT",
                 "Processing/configuration/ACTIVATE_WORKFLOW",
-                "Processing/configuration/ACTIVATE_WOIS_TOOLBOX",
+                "Processing/configuration/ACTIVATE_GWA Toolbox_TOOLBOX",
                 "Processing/configuration/GRASS_LOG_COMMANDS",
                 "Processing/configuration/GRASS_LOG_CONSOLE",
                 "Processing/configuration/SAGA_LOG_COMMANDS",
                 "Processing/configuration/SAGA_LOG_CONSOLE",
                 "Processing/configuration/USE_FILENAME_AS_LAYER_NAME",
-                "Processing/configuration/TASKBAR_BUTTON_WOIS_TOOLBOX")
+                "Processing/configuration/TASKBAR_BUTTON_GWA Toolbox_TOOLBOX")
         self.setQGISSettings("Processing/configuration/TASKBAR_BUTTON_WORKFLOW", "false")
         # GRASS_FOLDER depends on GRASS version and must be set explicitly here
         try:

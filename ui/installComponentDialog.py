@@ -88,12 +88,12 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "WOIS Installation", None))
+        Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation", None))
         self.cancelButton.setText(_translate("Dialog", "Cancel", None))
         self.topLabel.setText(_translate("Dialog", "BEAM is a software for analysing optical and thermal data derived with satellites operated by Europen Space Agency (ESA) and other organisation.", None))
         self.installButton.setText(_translate("Dialog", "Install", None))
-        self.bottomLabel2.setText(_translate("Dialog", "If you would like to abandon the installation altogether, click \"Cancel\". The WOIS components that were already installed will remain on your computer.", None))
-        self.bottomLabel1.setText(_translate("Dialog", "If you do not want to install this WOIS component click \"Skip\" to go the installation of the next component. However, note that by doing so you will not get the full WOIS functionality.", None))
+        self.bottomLabel2.setText(_translate("Dialog", "If you would like to abandon the installation altogether, click \"Cancel\". The GWA Toolbox components that were already installed will remain on your computer.", None))
+        self.bottomLabel1.setText(_translate("Dialog", "If you do not want to install this GWA Toolbox component click \"Skip\" to go the installation of the next component. However, note that by doing so you will not get the full GWA Toolbox functionality.", None))
         self.skipButton.setText(_translate("Dialog", "Skip", None))
         self.instructionMainLabel.setText(_translate("Dialog", "After clicking on the \"Install\" button the BEAM installer will start. In the installer you will be asked to accept the BEAM licence conditions followed by a couple of installation questions. In all the questions you can keep the defauly answers by clicking \"Next >\" untill the installation starts.", None))
         self.instructionsHeaderLabel.setText(_translate("Dialog", "Instructions:", None))

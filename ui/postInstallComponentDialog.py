@@ -99,16 +99,16 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "WOIS Installation", None))
+        Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation", None))
         self.instructionsFooterLabel.setText(_translate("Dialog", "Afterwards click \"Continue\".", None))
         self.topLabel.setText(_translate("Dialog", "BEAM is a software for analysing optical and thermal data derived with satellites operated by Europen Space Agency (ESA) and other organisation.", None))
-        self.instructionsMainLabel.setText(_translate("Dialog", "The WOIS installer will now perform additional post installation tasks for BEAM. If you changed the BEAM installation directory during the previous step, make sure that you update the path to the directory below.", None))
-        self.bottomLabel.setText(_translate("Dialog", "If you would like to abandon the installation altogether, click \"Cancel\". The WOIS components that were already installed will remain on your computer.", None))
+        self.instructionsMainLabel.setText(_translate("Dialog", "The GWA Toolbox installer will now perform additional post installation tasks for BEAM. If you changed the BEAM installation directory during the previous step, make sure that you update the path to the directory below.", None))
+        self.bottomLabel.setText(_translate("Dialog", "If you would like to abandon the installation altogether, click \"Cancel\". The GWA Toolbox components that were already installed will remain on your computer.", None))
         self.cancelButton.setText(_translate("Dialog", "Cancel", None))
         self.instructionsHeaderLabel.setText(_translate("Dialog", "Instructions:", None))
         self.dirSelectionButton.setText(_translate("Dialog", "...", None))
         self.continueButton.setText(_translate("Dialog", "Continue", None))
         self.dirPathText.setPlainText(_translate("Dialog", "dfgdgfdgf", None))
         self.skipButton.setText(_translate("Dialog", "Skip", None))
-        self.bottomLabel1.setText(_translate("Dialog", "If you do not want to install this WOIS component click \"Skip\" to go the installation of the next component. However, note that by doing so you will not get the full WOIS functionality.", None))
+        self.bottomLabel1.setText(_translate("Dialog", "If you do not want to install this GWA Toolbox component click \"Skip\" to go the installation of the next component. However, note that by doing so you will not get the full GWA Toolbox functionality.", None))
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WOIS Installation</string>
+   <string>GWA Toolbox Installation</string>
   </property>
   <widget class="Line" name="line_2">
    <property name="geometry">
@@ -81,7 +81,7 @@
     <locale language="English" country="UnitedKingdom"/>
    </property>
    <property name="text">
-    <string>If you would like to abandon the installation altogether, click &quot;Cancel&quot;. The WOIS components that were already installed will remain on your computer.</string>
+    <string>If you would like to abandon the installation altogether, click &quot;Cancel&quot;. The GWA Toolbox components that were already installed will remain on your computer.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -100,7 +100,7 @@
     <locale language="English" country="UnitedKingdom"/>
    </property>
    <property name="text">
-    <string>If you do not want to install this WOIS component click &quot;Skip&quot; to go the installation of the next component. However, note that by doing so you will not get the full WOIS functionality.</string>
+    <string>If you do not want to install this GWA Toolbox component click &quot;Skip&quot; to go the installation of the next component. However, note that by doing so you will not get the full GWA Toolbox functionality.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

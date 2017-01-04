@@ -78,12 +78,12 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "WOIS Installation", None))
+        Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation", None))
         self.continueButton.setText(_translate("Dialog", "Continue", None))
         self.topLabel.setText(_translate("Dialog", "BEAM is a software for analysing optical and thermal data derived with satellites operated by Europen Space Agency (ESA) and other organisation.", None))
         self.instructionsFooterLabel.setText(_translate("Dialog", "Afterwards click \"Continue\".", None))
         self.cancelButton.setText(_translate("Dialog", "Cancel", None))
         self.instructionsHeaderLabel.setText(_translate("Dialog", "Instructions:", None))
-        self.bottomLabel.setText(_translate("Dialog", "If you would like to abandon the installation altogether, click \"Cancel\". The WOIS components that were already installed will remain on your computer.", None))
+        self.bottomLabel.setText(_translate("Dialog", "If you would like to abandon the installation altogether, click \"Cancel\". The GWA Toolbox components that were already installed will remain on your computer.", None))
         self.instructionsMainLabel.setText(_translate("Dialog", "You need to activate BEAM plugins. To do that start BEAM, select \"Plugins\" from main menu and ...", None))
 

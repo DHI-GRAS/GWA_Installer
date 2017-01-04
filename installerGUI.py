@@ -5,18 +5,18 @@
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
 ***************************************************************************
-* This installer is part of the Water Observation Information System (WOIS)  *
+* This installer is part of the Water Observation Information System (GWA Toolbox)  *
 * developed under the TIGER-NET project funded by the European Space      *
 * Agency as part of the long-term TIGER initiative aiming at promoting    *
 * the use of Earth Observation (EO) for improved Integrated Water         *
 * Resources Management (IWRM) in Africa.                                  *
 *                                                                         *
-* WOIS is a free software i.e. you can redistribute it and/or modify      *
+* GWA Toolbox is a free software i.e. you can redistribute it and/or modify      *
 * it under the terms of the GNU General Public License as published       *
 * by the Free Software Foundation, either version 3 of the License,       *
 * or (at your option) any later version.                                  *
 *                                                                         *
-* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY *
+* GWA Toolbox is distributed in the hope that it will be useful, but WITHOUT ANY *
 * WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
 * for more details.                                                       *
@@ -136,16 +136,16 @@ class instructionsWindow(installerBaseWindow, componentInstructionsDialog.Ui_Dia
 # Individualise the parent classes mostly by changing the text
 
 
-# Instructions for activating WOIS plugins
+# Instructions for activating GWA Toolbox plugins
 class uninstallInstructionsWindow(instructionsWindow):
     def __init__(self):
         instructionsWindow.__init__(self)
 
     def retranslateUi(self, MainWindow):
         super(uninstallInstructionsWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "For smooth installation process some of the old components of WOIS have to be uninstalled if they are present on your computer.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "Please follow the uninstallation instructions present in the 'WOIS installation' document located in the WOIS installation directory.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Uninstall old version", None))
+        self.topLabel.setText(_translate("MainWindow", "For smooth installation process some of the old components of GWA Toolbox have to be uninstalled if they are present on your computer.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "Please follow the uninstallation instructions present in the 'GWA Toolbox installation' document located in the GWA Toolbox installation directory.", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Uninstall old version", None))
 
 
 # OSGeo4W
@@ -156,9 +156,9 @@ class osgeo4wInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(osgeo4wInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by WOIS while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
+        self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by GWA Toolbox while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. The process should be automatic but if any question dialogs pop-up just click OK.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
 
 class osgeo4wPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -168,10 +168,10 @@ class osgeo4wPostInstallWindow(postInstallWindow):
 
     def retranslateUi(self, MainWindow):
         super(osgeo4wPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by WOIS while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The WOIS installer will now perform additional post installation tasks for QGIS (activating plugins, copying extra libraries, etc.). If you changed the OSGeo4W/QGIS installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
+        self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by GWA Toolbox while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for QGIS (activating plugins, copying extra libraries, etc.). If you changed the OSGeo4W/QGIS installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
 
 
 # BEAM
@@ -184,7 +184,7 @@ class beamInstallWindow(installWindow):
         super(beamInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "BEAM is a software for analyzing optical and thermal data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the BEAM installer will start. In the installer you will be asked to accept the BEAM license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install BEAM", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install BEAM", None))
 
 class beamPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -195,9 +195,9 @@ class beamPostInstallWindow(postInstallWindow):
     def retranslateUi(self, MainWindow):
         super(beamPostInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "BEAM is a software for analyzing optical and thermal data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The WOIS installer will now perform additional post installation tasks for BEAM (activating plugins, copying extra libraries, etc.). If you changed the BEAM installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for BEAM (activating plugins, copying extra libraries, etc.). If you changed the BEAM installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install BEAM", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install BEAM", None))
 
 # SNAP
 class snapInstallWindow(installWindow):
@@ -209,7 +209,7 @@ class snapInstallWindow(installWindow):
         super(snapInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "Snap Toolbox is a software for analyzing data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the Snap Toolbox installer will start. In the installer you will be asked to accept the Snap Toolbox license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install Snap Toolbox", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
 
 class snapPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -220,9 +220,9 @@ class snapPostInstallWindow(postInstallWindow):
     def retranslateUi(self, MainWindow):
         super(snapPostInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "Snap Toolbox is a software for analyzing data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The WOIS installer will now perform additional post installation tasks for Snap Toolbox (activating plugins, copying extra libraries, etc.). If you changed the Snap Toolbox installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for Snap Toolbox (activating plugins, copying extra libraries, etc.). If you changed the Snap Toolbox installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install Snap Toolbox", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
 
 # R
 class rInstallWindow(installWindow):
@@ -232,9 +232,9 @@ class rInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(rInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by WOIS for various data processing tasks.", None))
+        self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by GWA Toolbox for various data processing tasks.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. In the installer you will be asked to accept the R license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install R", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
 
 class rPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -244,10 +244,10 @@ class rPostInstallWindow(postInstallWindow):
 
     def retranslateUi(self, MainWindow):
         super(rPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by WOIS for various data processing tasks.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The WOIS installer will now perform additional post installation tasks for R (activating plugins, copying extra libraries, etc.). If you changed the R installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
+        self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by GWA Toolbox for various data processing tasks.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for R (activating plugins, copying extra libraries, etc.). If you changed the R installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install R", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
 
 # PostGre
 class postgreInstallWindow(installWindow):
@@ -257,9 +257,9 @@ class postgreInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(postgreInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by WOIS for storing certain types of data. It is not necessary to have it installed on every computer using WOIS, since the database can run from a central server. Therefore its installation is optional.", None))
+        self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by GWA Toolbox for storing certain types of data. It is not necessary to have it installed on every computer using GWA Toolbox, since the database can run from a central server. Therefore its installation is optional.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer will start. You can keep all the default options and set superuser password (e.g. waterinfo) when requested. <b>Remember to write down the superuser name and the password.</b> In the last step make sure that the option to launch Stack Builder is <b>NOT</b> selected.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install PostGIS (Optional)", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
 # PostGIS
 class postgisInstallWindow(installWindow):
@@ -269,9 +269,9 @@ class postgisInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(postgisInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by WOIS for storing certain types of data. It is not necessary to have it installed on every computer using WOIS, since the database can run from a central server. Therefore its installation is optional.", None))
+        self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by GWA Toolbox for storing certain types of data. It is not necessary to have it installed on every computer using GWA Toolbox, since the database can run from a central server. Therefore its installation is optional.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostGIS installer will start. You need to accept the license and then when choosing components to install select 'PostGIS' <b>but not 'Create spatial database'</b>. If any questions pop up just click Yes.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Install PostGIS (Optional)", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
 # MapWindow
 class mapwindowInstallWindow(installWindow):
@@ -281,9 +281,9 @@ class mapwindowInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(mapwindowInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "SWAT is used by WOIS for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the MapWindow installer will start. MapWindow is used as front end for setting up new SWAT models. During the installation keep all the default options", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - SWAT hydrological model (Optional)", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 # MWSWAT
 class mwswatInstallWindow(installWindow):
     def __init__(self):
@@ -292,9 +292,9 @@ class mwswatInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(mwswatInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "SWAT is used by WOIS for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the MWSWAT 2009 installer will start. MWSWAT is the SWAT implementation used by WOIS. During the installation keep all the default options", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - SWAT hydrological model (Optional)", None))
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the MWSWAT 2009 installer will start. MWSWAT is the SWAT implementation used by GWA Toolbox. During the installation keep all the default options", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 class mwswatPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -304,10 +304,10 @@ class mwswatPostInstallWindow(postInstallWindow):
 
     def retranslateUi(self, MainWindow):
         super(mwswatPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "SWAT is used by WOIS for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The WOIS installer will now perform additional post installation tasks for SWAT. If you changed the MapWindow installation directory during the previous steps, make sure that you update the path to the directory below.", None))
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for SWAT. If you changed the MapWindow installation directory during the previous steps, make sure that you update the path to the directory below.", None))
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - SWAT hydrological model (Optional)", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 
 # MWSWAT editor
@@ -318,9 +318,9 @@ class swateditorInstallWindow(installWindow):
 
     def retranslateUi(self, MainWindow):
         super(swateditorInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "SWAT is used by WOIS for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the SWAT editor installer will start. SWAT editor is used for setting up new SWAT models. During the installation keep all the default options", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - SWAT hydrological model (Optional)", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 # Finish
 class finishWindow(instructionsWindow):
@@ -329,13 +329,13 @@ class finishWindow(instructionsWindow):
 
     def retranslateUi(self, MainWindow):
         super(finishWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "The WOIS has now been installed on your computer. Thank you.", None))
+        self.topLabel.setText(_translate("MainWindow", "The GWA Toolbox has now been installed on your computer. Thank you.", None))
         self.instructionsMainLabel.setText(_translate("MainWindow", "You can now start QGIS to begin working with the Water Information and Observation System.", None))
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setText(_translate("MainWindow", "Click \"Finish\" to finish the installation process", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Finished", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Finished", None))
         self.cancelButton.setText(_translate("MainWindow", "Finish", None))
 
 
@@ -367,7 +367,7 @@ class cmdWaitWindow(instructionsWindow, QtCore.QObject):
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setVisible(False)
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Running install command.", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Running install command.", None))
         self.cancelButton.setVisible(False)
 
     def startAction(self):
@@ -407,7 +407,7 @@ class extractingWaitWindow(instructionsWindow, QtCore.QObject):
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setVisible(False)
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Extracting an archive", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Extracting an archive", None))
         self.cancelButton.setVisible(False)
 
     def startAction(self):
@@ -446,7 +446,7 @@ class copyingWaitWindow(instructionsWindow, QtCore.QObject):
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setVisible(False)
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "WOIS Installation - Copying Files", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Copying Files", None))
         self.cancelButton.setVisible(False)
 
     def startAction(self):

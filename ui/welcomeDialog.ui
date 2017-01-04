@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WOIS Installation</string>
+   <string>GWA Toolbox Installation</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -72,7 +72,7 @@
     <locale language="English" country="UnitedKingdom"/>
    </property>
    <property name="text">
-    <string>By beginning the installation you accept the license conditions for the TIGER-NET developed software, stated below. The other WOIS components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source.</string>
+    <string>By beginning the installation you accept the license conditions for the TIGER-NET developed software, stated below. The other GWA Toolbox components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -258,7 +258,7 @@ p, li { white-space: pre-wrap; }
     <locale language="English" country="UnitedKingdom"/>
    </property>
    <property name="text">
-    <string>WOIS is an easy to use, open-source toolkit designed to facilitate integrated water resources management with the help of Earth observation data. It was developed during the TIGER-NET project.</string>
+    <string>GWA Toolbox is an easy to use, open-source toolkit designed to facilitate integrated water resources management with the help of Earth observation data. It was developed during the TIGER-NET project.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -287,7 +287,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="text">
-    <string>Welcome to the Water Observation and Information System (WOIS) installation program, which will guide you through the installation of the WOIS components.</string>
+    <string>Welcome to the Water Observation and Information System (GWA Toolbox) installation program, which will guide you through the installation of the GWA Toolbox components.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

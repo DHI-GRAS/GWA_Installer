@@ -35,7 +35,7 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
     # Check how much RAM the system has. Only works in Windows
     if sys.platform != 'win32':
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("This installer is only meant for Windows!\n\n The installed WOIS might not work properly.")
+        msgBox.setText("This installer is only meant for Windows!\n\n The installed GWA Toolbox might not work properly.")
         msgBox.exec_()
         return
     totalRam = _ram()

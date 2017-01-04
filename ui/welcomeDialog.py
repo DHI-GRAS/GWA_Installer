@@ -75,9 +75,9 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "WOIS Installation", None))
+        Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation", None))
         self.osLabel.setText(_translate("Dialog", "Choose your operating system (32 bit or 64 bit):", None))
-        self.licenseLabel.setText(_translate("Dialog", "By beginning the installation you accept the license conditions for the TIGER-NET developed software, stated below. The other WOIS components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source.", None))
+        self.licenseLabel.setText(_translate("Dialog", "By beginning the installation you accept the license conditions for the TIGER-NET developed software, stated below. The other GWA Toolbox components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source.", None))
         self.cancelButton.setText(_translate("Dialog", "Cancel", None))
         self.licenseTextBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -221,7 +221,7 @@ class Ui_Dialog(object):
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The hypothetical commands `show w\' and `show c\' should show the appropriate parts of the General Public License. Of course, your program\'s commands might be different; for a GUI interface, you would use an “about box”. </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">You should also get your employer (if you work as a programmer) or school, if any, to sign a “copyright disclaimer” for the program, if necessary. For more information on this, and how to apply and follow the GNU GPL, see &lt;http://www.gnu.org/licenses/&gt;. </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The GNU General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. But first, please read &lt;http://www.gnu.org/philosophy/why-not-lgpl.html&gt;. </span></p></body></html>", None))
-        self.topLabel2.setText(_translate("Dialog", "WOIS is an easy to use, open-source toolkit designed to facilitate integrated water resources management with the help of Earth observation data. It was developed during the TIGER-NET project.", None))
+        self.topLabel2.setText(_translate("Dialog", "GWA Toolbox is an easy to use, open-source toolkit designed to facilitate integrated water resources management with the help of Earth observation data. It was developed during the TIGER-NET project.", None))
         self.beginButton.setText(_translate("Dialog", "Begin", None))
-        self.topLabel1.setText(_translate("Dialog", "Welcome to the Water Observation and Information System (WOIS) installation program, which will guide you through the installation of the WOIS components.", None))
+        self.topLabel1.setText(_translate("Dialog", "Welcome to the Water Observation and Information System (GWA Toolbox) installation program, which will guide you through the installation of the GWA Toolbox components.", None))
 
