@@ -1,4 +1,4 @@
-# WOIS_Installer <img src="https://github.com/DHI-GRAS/GWA_Installer/blob/master/GWA.ico" height="40">
+# GWA Toolbox Installer <img src="https://github.com/DHI-GRAS/GWA_Installer/blob/master/GWA.ico" height="40">
 
 This installer is part of The GWA toolbox developed under the GlobWetland Africa project. 
 
