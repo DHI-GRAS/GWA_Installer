@@ -2,24 +2,22 @@
 ***************************************************************************
    installerGUI.py
 -------------------------------------
-    Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
+    Copyright (C) 2016 globWetland Africa (www.globwetland-africa.org)
 
 ***************************************************************************
-* This installer is part of the Water Observation Information System (GWA Toolbox)  *
-* developed under the TIGER-NET project funded by the European Space      *
-* Agency as part of the long-term TIGER initiative aiming at promoting    *
-* the use of Earth Observation (EO) for improved Integrated Water         *
-* Resources Management (IWRM) in Africa.                                  *
+* The GlobWetland Africa toolbox has been developed as part of the Glob-  *
+* Wetland Africa project funded by the European Space Agency (ESA) in     *
+* partnership with the Africa Team of the Ramsar Convention on Wetlands.  *
 *                                                                         *
-* GWA Toolbox is a free software i.e. you can redistribute it and/or modify      *
-* it under the terms of the GNU General Public License as published       *
-* by the Free Software Foundation, either version 3 of the License,       *
+* The Toolbox is a free software i.e. you can redistribute it and/or      *
+* modify it under the terms of the GNU General Public License as publis-  *
+* hed by the Free Software Foundation, either version 3 of the License,   *
 * or (at your option) any later version.                                  *
 *                                                                         *
-* GWA Toolbox is distributed in the hope that it will be useful, but WITHOUT ANY *
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
-* for more details.                                                       *
+* The Toolbox is distributed in the hope that it will be useful, but      *
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTA-   *
+* BILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public *
+* License for more details.                                               *
 *                                                                         *
 * You should have received a copy of the GNU General Public License along *
 * with this program.  If not, see <http://www.gnu.org/licenses/>.         *
@@ -330,7 +328,7 @@ class finishWindow(instructionsWindow):
     def retranslateUi(self, MainWindow):
         super(finishWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "The GWA Toolbox has now been installed on your computer. Thank you.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "You can now start QGIS to begin working with the Water Information and Observation System.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "You can now start QGIS to begin working with the GWA Toolbox.", None))
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
