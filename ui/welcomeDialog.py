@@ -28,7 +28,7 @@ class Ui_Dialog(object):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(570, 464)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("../WOIS.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("../GWA.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Dialog.setWindowIcon(icon)
         self.logoLabel = QtGui.QLabel(Dialog)
         self.logoLabel.setGeometry(QtCore.QRect(420, 50, 131, 51))

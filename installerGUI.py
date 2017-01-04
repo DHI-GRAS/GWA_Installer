@@ -63,7 +63,7 @@ class installerBaseWindow():
         else:
             self.MainWindow = QtGui.QDialog()
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("images/WOIS.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("images/GWA.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.MainWindow.setWindowIcon(icon)
 
     def exec_(self):
