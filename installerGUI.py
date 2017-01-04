@@ -83,7 +83,7 @@ class installerWelcomeWindow(installerBaseWindow, welcomeDialog.Ui_Dialog):
     def __init__(self):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/tigernetLogo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
         self.osComboBox.addItem("64 bit")
         self.osComboBox.addItem("32 bit")
 
@@ -94,7 +94,7 @@ class installWindow(installerBaseWindow, installComponentDialog.Ui_Dialog):
     def __init__(self):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/tigernetLogo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
 
         QtCore.QObject.connect(self.installButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.skipButton, QtCore.SIGNAL("clicked()"), self.skip)
@@ -105,7 +105,7 @@ class postInstallWindow(installerBaseWindow, postInstallComponentDialog.Ui_Dialo
     def __init__(self):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/tigernetLogo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
 
         QtCore.QObject.connect(self.continueButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.skipButton, QtCore.SIGNAL("clicked()"), self.skip)
@@ -125,7 +125,7 @@ class instructionsWindow(installerBaseWindow, componentInstructionsDialog.Ui_Dia
 
         installerBaseWindow.__init__(self, MainWindow)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/tigernetLogo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
 
         QtCore.QObject.connect(self.continueButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)

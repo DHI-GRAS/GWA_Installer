@@ -35,7 +35,7 @@ class Ui_Dialog(object):
         self.logoLabel = QtGui.QLabel(Dialog)
         self.logoLabel.setGeometry(QtCore.QRect(420, 30, 131, 51))
         self.logoLabel.setText(_fromUtf8(""))
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("../images/tigernetLogo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("../images/GWA_logo.png")))
         self.logoLabel.setScaledContents(True)
         self.logoLabel.setObjectName(_fromUtf8("logoLabel"))
         self.topLabel = QtGui.QLabel(Dialog)
