@@ -287,7 +287,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="text">
-    <string>Welcome to the Water Observation and Information System (GWA Toolbox) installation program, which will guide you through the installation of the GWA Toolbox components.</string>
+    <string>Welcome to the GlobWetland Africa (GWA) Toolbox installation program, which will guide you through the installation of the GWA Toolbox components.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
