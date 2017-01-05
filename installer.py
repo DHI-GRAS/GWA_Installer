@@ -1,31 +1,3 @@
-"""
-***************************************************************************
-   woisInstaller.py
--------------------------------------
-    Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
-
-***************************************************************************
-* This installer is part of the Water Observation Information System (GWA Toolbox)  *
-* developed under the TIGER-NET project funded by the European Space      *
-* Agency as part of the long-term TIGER initiative aiming at promoting    *
-* the use of Earth Observation (EO) for improved Integrated Water         *
-* Resources Management (IWRM) in Africa.                                  *
-*                                                                         *
-* GWA Toolbox is a free software i.e. you can redistribute it and/or modify      *
-* it under the terms of the GNU General Public License as published       *
-* by the Free Software Foundation, either version 3 of the License,       *
-* or (at your option) any later version.                                  *
-*                                                                         *
-* GWA Toolbox is distributed in the hope that it will be useful, but WITHOUT ANY *
-* WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
-* for more details.                                                       *
-*                                                                         *
-* You should have received a copy of the GNU General Public License along *
-* with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-***************************************************************************
-"""
-
 from PyQt4 import QtCore, QtGui
 from installerGUI import installerWelcomeWindow, beamInstallWindow, beamPostInstallWindow, snapInstallWindow, snapPostInstallWindow
 from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow, rInstallWindow, postgreInstallWindow, postgisInstallWindow
@@ -47,7 +19,7 @@ from distutils import dir_util
 
 import installer_utils
 
-class woisInstaller():
+class Installer():
 
     def __init__(self):
         self.util = Utilities()
@@ -477,7 +449,7 @@ class Utilities(QtCore.QObject):
 
     def execute_cmd(self, cmd):
         """Execute cmd and save output to log file"""
-        with tempfile.NamedTemporaryFile(prefix='wois_installer_', suffix='.log', delete=False) as f:
+        with tempfile.NamedTemporaryFile(prefix='gwa_installer_', suffix='.log', delete=False) as f:
             output = ''
             try:
                 si = subprocess.STARTUPINFO()
@@ -695,11 +667,12 @@ class Utilities(QtCore.QObject):
                 "Processing/configuration/ACTIVATE_WG9HM")
         self.setQGISSettings("Processing/configuration/MAPWINDOW_FOLDER", dirPath)
 
+
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
 
-    installer = woisInstaller()
+    installer = Installer()
 
     # Fix to make sure that runInstaller is executed in the app event loop
     def _slot_installer():
