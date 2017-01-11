@@ -1,3 +1,28 @@
+"""
+***************************************************************************
+   installer.py
+-------------------------------------
+    Copyright (C) 2016 globWetland Africa (www.globwetland-africa.org)
+
+***************************************************************************
+* The GlobWetland Africa toolbox has been developed as part of the Glob-  *
+* Wetland Africa project funded by the European Space Agency (ESA) in     *
+* partnership with the Africa Team of the Ramsar Convention on Wetlands.  *
+*                                                                         *
+* The Toolbox is a free software i.e. you can redistribute it and/or      *
+* modify it under the terms of the GNU General Public License as publis-  *
+* hed by the Free Software Foundation, either version 3 of the License,   *
+* or (at your option) any later version.                                  *
+*                                                                         *
+* The Toolbox is distributed in the hope that it will be useful, but      *
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTA-   *
+* BILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public *
+* License for more details.                                               *
+*                                                                         *
+* You should have received a copy of the GNU General Public License along *
+* with this program.  If not, see <http://www.gnu.org/licenses/>.         *
+***************************************************************************
+"""
 from PyQt4 import QtCore, QtGui
 from installerGUI import installerWelcomeWindow, beamInstallWindow, beamPostInstallWindow, snapInstallWindow, snapPostInstallWindow
 from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow, rInstallWindow, postgreInstallWindow, postgisInstallWindow
