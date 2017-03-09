@@ -35,9 +35,6 @@ class Ui_Dialog(object):
         self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("../images/GWA_logo.png")))
         self.logoLabel.setScaledContents(True)
         self.logoLabel.setObjectName(_fromUtf8("logoLabel"))
-        self.osComboBox = QtGui.QComboBox(Dialog)
-        self.osComboBox.setGeometry(QtCore.QRect(280, 150, 81, 16))
-        self.osComboBox.setObjectName(_fromUtf8("osComboBox"))
         self.osLabel = QtGui.QLabel(Dialog)
         self.osLabel.setGeometry(QtCore.QRect(20, 150, 251, 16))
         self.osLabel.setObjectName(_fromUtf8("osLabel"))
@@ -75,7 +72,6 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation", None))
-        self.osLabel.setText(_translate("Dialog", "Choose your operating system (32 bit or 64 bit):", None))
         self.licenseLabel.setText(_translate("Dialog", "By beginning the installation you accept the license conditions for the GlobWetland Africa developed software, stated below. The other GWA Toolbox components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source.", None))
         self.cancelButton.setText(_translate("Dialog", "Cancel", None))
         self.licenseTextBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
