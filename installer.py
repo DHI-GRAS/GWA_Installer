@@ -134,6 +134,7 @@ class Installer():
         if res == NEXT:
             # pip installations
             dirPath = str(self.dialog.dirPathText.toPlainText())
+            osgeo4wDefaultDir = dirPath
             pipbat = os.path.join("QGIS GWA Toolbox plugins", 'pip_installs', 'install_pip_packages.bat')
             if installer_utils.check_file_exists(pipbat):
                 cmd = [pipbat, dirPath]
@@ -212,10 +213,6 @@ class Installer():
             ram_fraction = 0.4 if is32bit else 0.6
             installer_utils.modifyRamInBatFiles(os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
             self.util.activateBEAMplugin(dirPath)
-            # Temporary fix for https://github.com/TIGER-NET/Processing-GPF/issues/1, until new version of BEAM is out.
-            # When that happens also remove beam-meris-radiometry-5.0.1.jar from "BEAM additional modules"
-            #self.util.deleteFile(os.path.join(dstPath, "beam-meris-radiometry-5.0.jar"))
-            #self.util.deleteFile(os.path.join(dstPath, "beam-meris-case2-regional-1.6.jar"))
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -250,6 +247,12 @@ class Installer():
         # Set the amount of memory to be used with NEST GPT
         if res == NEXT:
             dirPath = str(self.dialog.dirPathText.toPlainText())
+            confbat = os.path.join(dirPath, 'bin', 'snappy-conf.bat')
+            osgeopython = os.path.join(osgeo4wDefaultDir, 'bin', 'python.exe')
+            cmd = [confbat, osgeopython]
+            # show dialog because it might take some time on slower computers
+            self.dialog = cmdWaitWindow(self.util, cmd)
+            self.showDialog()
             dstPath = os.path.join(os.path.expanduser("~"), ".snap")
             srcPath = "SNAP additional modules"
             self.util.copyFiles(srcPath, dstPath)
