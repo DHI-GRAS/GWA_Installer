@@ -82,8 +82,6 @@ class installerWelcomeWindow(installerBaseWindow, welcomeDialog.Ui_Dialog):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
         self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
-        self.osComboBox.addItem("64 bit")
-        self.osComboBox.addItem("32 bit")
 
         QtCore.QObject.connect(self.beginButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
