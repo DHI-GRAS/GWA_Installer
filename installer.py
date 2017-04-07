@@ -139,7 +139,7 @@ class Installer():
             # pip installations
             dirPath = str(self.dialog.dirPathText.toPlainText())
             # copy the plugins
-            dstPath = os.path.join(os.path.expanduser("~"),".qgis2","python")
+            dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
             srcPath = os.path.join("QGIS GWA Toolbox plugins", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
@@ -155,16 +155,17 @@ class Installer():
                 'valuetool']
             for plugin in plugins_to_delete:
                 self.util.deleteDir(
-                        os.path.join(dstPath, 'plugins', plugin))
+                        os.path.join(dstPath, plugin))
             # show dialog because it might take some time on slower computers
             self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
             # copy scripts and models
-            dstPath = os.path.join(os.path.expanduser("~"),".qgis2","processing")
-            srcPath = os.path.join("QGIS GWA Toolbox plugins", "scripts_and_models.zip")
-            # show dialog because it might take some time on slower computers
-            self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
-            self.showDialog()
+            dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
+            for zipfname in ['WOIS_scripts', 'GWA_scripts', 'GWA_models_and_workflows']:
+                srcPath = os.path.join("QGIS GWA Toolbox plugins", zipfname)
+                # show dialog because it might take some time on slower computers
+                self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
+                self.showDialog()
             # activate plugins and processing providers
             self.util.activatePlugins()
             self.util.activateProcessingProviders(osgeo4wDefaultDir)
