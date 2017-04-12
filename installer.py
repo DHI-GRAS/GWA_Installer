@@ -621,6 +621,7 @@ class Utilities(QtCore.QObject):
 
     def activatePlugins(self):
         self.activateThis(
+                "PythonPlugins/atmospheric_correction",
                 "PythonPlugins/processing_workflow",
                 "PythonPlugins/openlayers_plugin",
                 "PythonPlugins/photo2shape",
@@ -638,6 +639,7 @@ class Utilities(QtCore.QObject):
                 "Processing/configuration/ACTIVATE_OTB",
                 "Processing/configuration/ACTIVATE_QGIS",
                 "Processing/configuration/ACTIVATE_SAGA",
+                "Processing/configuration/ACTIVATE_DHIGRAS",
                 "Processing/configuration/ACTIVATE_SCRIPT",
                 "Processing/configuration/ACTIVATE_WORKFLOW",
                 "Processing/configuration/ACTIVATE_GWA_TBX",
