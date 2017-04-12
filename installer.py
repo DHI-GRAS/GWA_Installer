@@ -640,25 +640,20 @@ class Utilities(QtCore.QObject):
                 "Processing/configuration/ACTIVATE_SAGA",
                 "Processing/configuration/ACTIVATE_SCRIPT",
                 "Processing/configuration/ACTIVATE_WORKFLOW",
-                "Processing/configuration/ACTIVATE_GWA_TOOLBOX",
+                "Processing/configuration/ACTIVATE_GWA_TBX",
+                "Processing/configuration/ACTIVATE_WOIS_TOOLBOX",
                 "Processing/configuration/GRASS_LOG_COMMANDS",
                 "Processing/configuration/GRASS_LOG_CONSOLE",
                 "Processing/configuration/SAGA_LOG_COMMANDS",
                 "Processing/configuration/SAGA_LOG_CONSOLE",
                 "Processing/configuration/USE_FILENAME_AS_LAYER_NAME",
-                "Processing/configuration/TASKBAR_BUTTON_GWA_TOOLBOX")
+                "Processing/configuration/TASKBAR_BUTTON_GWA_TBX")
         self.setQGISSettings("Processing/configuration/TASKBAR_BUTTON_WORKFLOW", "false")
         # GRASS_FOLDER depends on GRASS version and must be set explicitly here
         try:
             grass_root = os.path.join(osgeo4wDefaultDir, 'apps', 'grass')
             grass_folders = sorted([d for d in glob.glob(os.path.join(grass_root, 'grass-*')) if os.path.isdir(d)])
-            grass6_folders = [d for d in grass_folders if os.path.basename(d).startswith('grass-6')]
-            try:
-                # highest GRASS6 version
-                grassFolder = grass6_folders[-1]
-            except IndexError:
-                # highest GRASS version
-                grassFolder = grass_folders[-1]
+            grassFolder = grass_folders[-1]
             self.setQGISSettings("Processing/configuration/GRASS_FOLDER", grassFolder)
         except (IndexError, OSError):
             pass
