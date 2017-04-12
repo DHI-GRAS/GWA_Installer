@@ -161,7 +161,9 @@ class Installer():
             self.showDialog()
             # copy scripts and models
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
-            for zipfname in ['WOIS_scripts', 'GWA_scripts', 'GWA_models_and_workflows']:
+            for zipfname in [
+                    'WOIS_scripts.zip', 'WOIS_models_and_workflows.zip',
+                    'GWA_scripts.zip', 'GWA_models_and_workflows.zip']:
                 srcPath = os.path.join("QGIS GWA Toolbox plugins", zipfname)
                 # show dialog because it might take some time on slower computers
                 self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
