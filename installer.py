@@ -160,14 +160,24 @@ class Installer():
             self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
             # copy scripts and models
+            QGIS_extras_dir = os.path.abspath("QGIS GWA Toolbox plugins")
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
             for zipfname in [
                     'WOIS_scripts.zip', 'WOIS_models_and_workflows.zip',
                     'GWA_scripts.zip', 'GWA_models_and_workflows.zip']:
-                srcPath = os.path.join("QGIS GWA Toolbox plugins", zipfname)
+                srcPath = os.path.join(QGIS_extras_dir, zipfname)
                 # show dialog because it might take some time on slower computers
                 self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
                 self.showDialog()
+            # install fmask and rios
+            site_packages = os.path.join(dirPath, 'apps', 'Python27', 'Lib', 'site-packages')
+            if not os.path.isdir(site_packages):
+                pass
+            else:
+                srcPath = os.path.join(QGIS_extras_dir, 'fmask-rios.zip')
+                self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
+                self.showDialog()
+
             # activate plugins and processing providers
             self.util.activatePlugins()
             self.util.activateProcessingProviders(osgeo4wDefaultDir)
@@ -179,8 +189,7 @@ class Installer():
         else:
             self.unknownActionPopup()
 
-
-        ########################################################################
+        # #######################################################################
         # Install BEAM
 
         self.dialog = beamInstallWindow()
@@ -189,8 +198,8 @@ class Installer():
         # run the BEAM installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(beamInstall)
-            #self.dialog =  beamPostInstallWindow(beamDefaultDir);
-            #res = self.showDialog()
+            # self.dialog =  beamPostInstallWindow(beamDefaultDir);
+            # res = self.showDialog()
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -277,8 +286,7 @@ class Installer():
         else:
             self.unknownActionPopup()
 
-
-        ########################################################################
+        # #######################################################################
         # Install R
 
         self.dialog = rInstallWindow()
@@ -287,8 +295,8 @@ class Installer():
         # run the R installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(rInstall)
-            #self.dialog = rPostInstallWindow(rDefaultDir)
-            #res = self.showDialog()
+            # self.dialog = rPostInstallWindow(rDefaultDir)
+            # res = self.showDialog()
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -462,7 +470,7 @@ class Utilities(QtCore.QObject):
             msgBox = QtGui.QMessageBox()
             msgBox.setText("Could not find the installation file for this component!\n\n Skipping to next component")
             msgBox.exec_()
-            #self.dialog.action = SKIP
+            # self.dialog.action = SKIP
             return
 
         proc = subprocess.Popen(
@@ -471,8 +479,7 @@ class Utilities(QtCore.QObject):
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                universal_newlines=True,
-                ).stdout
+                universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
             pass
 
@@ -487,7 +494,6 @@ class Utilities(QtCore.QObject):
                         stdin=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                         startupinfo=si)
-            #except (subprocess.CalledProcessError, WindowsError, OSError):
             except:
                 trace = traceback.format_exc()
                 msgBox = QtGui.QMessageBox()
@@ -534,8 +540,8 @@ class Utilities(QtCore.QObject):
 
         # checkWritePremissions alsoe creates the directory if it doesn't exist yet
         if not self.checkWritePermissions(dstPath):
-            self.error_exit("You do not have permissions to write to destination directory!\n\n No files were copied.\n\n"+
-                            "Re-run the installer with administrator privileges or manually copy files from "+srcPath+
+            self.error_exit("You do not have permissions to write to destination directory!\n\n No files were copied.\n\n" +
+                            "Re-run the installer with administrator privileges or manually copy files from "+srcPath +
                             " to "+dstPath+" after the installation process is over.")
             return
 
@@ -559,8 +565,8 @@ class Utilities(QtCore.QObject):
 
         # checkWritePremissions also creates the directory if it doesn't exist yet
         if not self.checkWritePermissions(dstPath):
-            self.error_exit("You do not have permissions to write to destination directory!\n\n No files were copied.\n\n"+
-                           "Re-run the installer with administrator privileges or manually unzip files from "+archivePath+
+            self.error_exit("You do not have permissions to write to destination directory!\n\n No files were copied.\n\n" +
+                           "Re-run the installer with administrator privileges or manually unzip files from " + archivePath +
                            " to "+dstPath+" after the installation process is over.")
             return
 
@@ -633,7 +639,7 @@ class Utilities(QtCore.QObject):
 
     def activateProcessingProviders(self, osgeo4wDefaultDir):
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS70", "true")
-        self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS", "false")
+        self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS", "true")
         self.activateThis(
                 "Processing/configuration/ACTIVATE_MODEL",
                 "Processing/configuration/ACTIVATE_OTB",
