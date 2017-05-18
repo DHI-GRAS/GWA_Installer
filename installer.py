@@ -171,12 +171,9 @@ class Installer():
                 self.showDialog()
             # install fmask and rios
             site_packages = os.path.join(dirPath, 'apps', 'Python27', 'Lib', 'site-packages')
-            if not os.path.isdir(site_packages):
-                pass
-            else:
-                srcPath = os.path.join(QGIS_extras_dir, 'fmask-rios.zip')
-                self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
-                self.showDialog()
+            srcPath = os.path.join(QGIS_extras_dir, 'fmask-rios.zip')
+            self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
+            self.showDialog()
 
             # activate plugins and processing providers
             self.util.activatePlugins()
