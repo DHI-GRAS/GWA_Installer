@@ -170,9 +170,14 @@ class Installer():
                 # show dialog because it might take some time on slower computers
                 self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
                 self.showDialog()
-            # install fmask and rios
+            # additional python modules
             site_packages = os.path.join(dirPath, 'apps', 'Python27', 'Lib', 'site-packages')
+            # install fmask and rios
             srcPath = os.path.join(QGIS_extras_dir, 'fmask-rios.zip')
+            self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
+            self.showDialog()
+            # install cv2
+            srcPath = os.path.join(QGIS_extras_dir, 'cv2.zip')
             self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
             self.showDialog()
 
