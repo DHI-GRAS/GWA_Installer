@@ -29,15 +29,16 @@ from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow, rInstal
 from installerGUI import mapwindowInstallWindow, mwswatInstallWindow, mwswatPostInstallWindow, swateditorInstallWindow, finishWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow, cmdWaitWindow, uninstallInstructionsWindow, rPostInstallWindow
 from installerGUI import CANCEL,SKIP,NEXT
-import sys
 import os
+import sys
+import re
 import glob
 import errno
 import shutil
 import subprocess
-import re
 import traceback
 import tempfile
+import time
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 from distutils import dir_util
@@ -328,15 +329,15 @@ class Installer():
 
         ########################################################################
         # Install PostGIS
+        postgres_installed = False
 
         self.dialog = postgreInstallWindow()
         res = self.showDialog()
 
-        # run the postgresql installer as an outside process
+        # install Postgres
         if res == NEXT:
             self.util.execSubprocess(postgreInstall)
-            self.dialog = postgisInstallWindow()
-            res = self.showDialog()
+            postgres_installed = True
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -345,95 +346,108 @@ class Installer():
         else:
             self.unknownActionPopup()
 
-        # run the postgis installer as an outside process
-        if res == NEXT:
-            self.util.execSubprocess(postgisInstall)
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
+        if postgres_installed:
+            # install PostGIS
+            self.dialog = postgisInstallWindow()
+            res = self.showDialog()
+            if res == NEXT:
+                self.util.execSubprocess(postgisInstall)
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
 
         ########################################################################
         # Install MapWindow, SWAT and PEST
+        mapwindow_installed = False
+        mswat_installed = False
+        swateditor_installed = False
 
+        # install MapWindow
         self.dialog = mapwindowInstallWindow()
         res = self.showDialog()
-
-        # run the MapWindow installer as an outside process
         if res == NEXT:
             self.util.execSubprocess(mapwindowInstall)
+            mapwindow_installed = True
+        elif res == SKIP:
+            pass
+        elif res == CANCEL:
+            del self.dialog
+            return
+        else:
+            self.unknownActionPopup()
+
+        if mapwindow_installed:
+            # install MS SWAT
             self.dialog = mwswatInstallWindow()
             res = self.showDialog()
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
+            if res == NEXT:
+                self.util.execSubprocess(mwswatInstall)
+                mswat_installed = True
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
 
-        # run the MWSWAT installer as an outside process
-        if res == NEXT:
-            self.util.execSubprocess(mwswatInstall)
+        if mswat_installed:
+            # install SWAT editor
             self.dialog = swateditorInstallWindow()
             res = self.showDialog()
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
+            if res == NEXT:
+                self.util.execSubprocess(swateditorInstall)
+                time.sleep(5)
+                swateditor_installed = True
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
 
-        # run the SWAT editor installer as an outside process
-        if res == NEXT:
-            self.util.execSubprocess(swateditorInstall)
+        if swateditor_installed:
+            # install SWAT post-installation stuff
             self.dialog = mwswatPostInstallWindow(mapwindowDefaultDir)
             res = self.showDialog()
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
+            if res == NEXT:
+                # copy the DTU customised MWSWAT 2009 installation
+                dirPath = str(self.dialog.dirPathText.toPlainText())
+                mwswatPath = os.path.join(dirPath,"Plugins","MWSWAT2009")
+                dstPath = os.path.join(mwswatPath,'swat2009DtuEnvVers0.2')
+                srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
+                # show dialog because it might take some time on slower computers
+                self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
+                self.showDialog()
 
-        if res == NEXT:
-            # copy the DTU customised MWSWAT 2009 installation
-            dirPath = str(self.dialog.dirPathText.toPlainText())
-            mwswatPath = os.path.join(dirPath,"Plugins","MWSWAT2009")
-            dstPath = os.path.join(mwswatPath,'swat2009DtuEnvVers0.2')
-            srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
-            # show dialog because it might take some time on slower computers
-            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
-            self.showDialog()
-
-            # copy and rename the customised MWSWAT exe
-            if os.path.isfile(os.path.join(mwswatPath,"swat2009rev481.exe_old")):
-                os.remove(os.path.join(mwswatPath,"swat2009rev481.exe_old"))
-            os.rename(os.path.join(mwswatPath,"swat2009rev481.exe"), os.path.join(mwswatPath,"swat2009rev481.exe_old"))
-            self.util.copyFiles(os.path.join(dstPath, "swat2009DtuEnv.exe"), mwswatPath)
-            if os.path.isfile(os.path.join(mwswatPath,"swat2009rev481.exe")):
-                os.remove(os.path.join(mwswatPath,"swat2009rev481.exe"))
-            os.rename(os.path.join(mwswatPath,"swat2009DtuEnv.exe"), os.path.join(mwswatPath, "swat2009rev481.exe"))
-            # copy the modified database file
-            self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
-            # copy PEST
-            self.dialog = copyingWaitWindow(self.util, "MWSWAT additional software\\PEST", os.path.join(mwswatPath,"PEST"))
-            # show dialog because it might take some time on slower computers
-            self.showDialog()
-            # activate the plugin
-            self.util.activateSWATplugin(dirPath)
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
+                # copy and rename the customised MWSWAT exe
+                if os.path.isfile(os.path.join(mwswatPath,"swat2009rev481.exe_old")):
+                    os.remove(os.path.join(mwswatPath,"swat2009rev481.exe_old"))
+                os.rename(os.path.join(mwswatPath,"swat2009rev481.exe"), os.path.join(mwswatPath,"swat2009rev481.exe_old"))
+                self.util.copyFiles(os.path.join(dstPath, "swat2009DtuEnv.exe"), mwswatPath)
+                if os.path.isfile(os.path.join(mwswatPath,"swat2009rev481.exe")):
+                    os.remove(os.path.join(mwswatPath,"swat2009rev481.exe"))
+                os.rename(os.path.join(mwswatPath,"swat2009DtuEnv.exe"), os.path.join(mwswatPath, "swat2009rev481.exe"))
+                # copy the modified database file
+                self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
+                # copy PEST
+                self.dialog = copyingWaitWindow(self.util, "MWSWAT additional software\\PEST", os.path.join(mwswatPath,"PEST"))
+                # show dialog because it might take some time on slower computers
+                self.showDialog()
+                # activate the plugin
+                self.util.activateSWATplugin(dirPath)
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
 
         # Finish
         self.dialog = finishWindow()
