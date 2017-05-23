@@ -92,13 +92,13 @@ class Installer():
                 snapDefaultDir = "C:\\Program Files\\snap"
                 beamDefaultDir = "C:\\Program Files\\beam-5.0"
                 mapwindowDefaultDir = "C:\\Program Files\\MapWindow"
-                rDefaultDir = "C:\\Program Files\\R\\R-3.1.3"
+                rDefaultDir = "C:\\Program Files\\R\\R-3.3.2"
             else:
                 osgeo4wDefaultDir = "C:\\OSGeo4W64"
                 snapDefaultDir = "C:\\Program Files\\snap"
                 beamDefaultDir = "C:\\Program Files\\beam-5.0"
                 mapwindowDefaultDir = "C:\\Program Files (x86)\\MapWindow"
-                rDefaultDir = "C:\\Program Files\\R\\R-3.1.3"
+                rDefaultDir = "C:\\Program Files\\R\\R-3.3.2"
 
         elif res == CANCEL:
             del self.dialog
