@@ -141,7 +141,7 @@ class Installer():
             dirPath = str(self.dialog.dirPathText.toPlainText())
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
-            srcPath = os.path.join("QGIS GWA Toolbox plugins", "plugins.zip")
+            srcPath = os.path.join("QGIS additional software", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
                 'mikecprovider',
@@ -161,7 +161,7 @@ class Installer():
             self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
             # copy scripts and models
-            QGIS_extras_dir = os.path.abspath("QGIS GWA Toolbox plugins")
+            QGIS_extras_dir = os.path.abspath("QGIS additional software")
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
             for zipfname in [
                     'WOIS_scripts.zip', 'WOIS_models_and_workflows.zip',
