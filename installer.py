@@ -426,23 +426,27 @@ class Installer():
                 mwswatPath = os.path.join(dirPath,"Plugins","MWSWAT2009")
                 dstPath = os.path.join(mwswatPath,'swat2009DtuEnvVers0.2')
                 srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
-                # show dialog because it might take some time on slower computers
                 self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
                 self.showDialog()
 
                 # copy and rename the customised MWSWAT exe
-                if os.path.isfile(os.path.join(mwswatPath,"swat2009rev481.exe_old")):
-                    os.remove(os.path.join(mwswatPath,"swat2009rev481.exe_old"))
-                os.rename(os.path.join(mwswatPath,"swat2009rev481.exe"), os.path.join(mwswatPath,"swat2009rev481.exe_old"))
-                self.util.copyFiles(os.path.join(dstPath, "swat2009DtuEnv.exe"), mwswatPath)
-                if os.path.isfile(os.path.join(mwswatPath,"swat2009rev481.exe")):
-                    os.remove(os.path.join(mwswatPath,"swat2009rev481.exe"))
-                os.rename(os.path.join(mwswatPath,"swat2009DtuEnv.exe"), os.path.join(mwswatPath, "swat2009rev481.exe"))
+                oldexe = os.path.join(mwswatPath,"swat2009rev481.exe_old")
+                revexe = os.path.join(mwswatPath,"swat2009rev481.exe")
+                newexe = os.path.join(dstPath, "swat2009DtuEnv.exe")
+
+                if os.path.isfile(oldexe):
+                    os.remove(oldexe)
+                os.rename(revexe, oldexe)
+
+                self.util.copyFiles(newexe, mwswatPath)
+                if os.path.isfile(revexe):
+                    os.remove(revexe)
+                os.rename(newexe, revexe)
+
                 # copy the modified database file
                 self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
                 # copy PEST
                 self.dialog = copyingWaitWindow(self.util, "MWSWAT additional software\\PEST", os.path.join(mwswatPath,"PEST"))
-                # show dialog because it might take some time on slower computers
                 self.showDialog()
                 # activate the plugin
                 self.util.activateSWATplugin(dirPath)
