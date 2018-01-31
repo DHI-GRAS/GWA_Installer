@@ -64,7 +64,7 @@ class Installer():
                 installationsDir = installationsDirs[0]
                 osgeo4wInstall = os.path.join(installationsDir, "osgeo4w-setup.bat")
                 beamInstall = os.path.join(installationsDir, "beam_5.0_win32_installer.exe")
-                snapInstall = os.path.join(installationsDir, "esa-snap_sentinel_windows_6_0-PREVIEW5.exe")
+                snapInstall = os.path.join(installationsDir, "esa-snap_sentinel_windows_6_0.exe")
                 rInstall = os.path.join(installationsDir, "R-3.3.2-win.exe")
                 postgreInstall = os.path.join(installationsDir, "postgresql-9.3.6-2-windows.exe")
                 postgisInstall = os.path.join(installationsDir, "postgis-bundle-pg93x32-setup-2.1.5-1.exe")
@@ -73,7 +73,7 @@ class Installer():
                 installationsDir = installationsDirs[1]
                 osgeo4wInstall = os.path.join(installationsDir, "osgeo4w-setup.bat")
                 beamInstall = os.path.join(installationsDir, "beam_5.0_win64_installer.exe")
-                snapInstall = os.path.join(installationsDir, "esa-snap_sentinel_windows-x64_6_0-PREVIEW5.exe")
+                snapInstall = os.path.join(installationsDir, "esa-snap_sentinel_windows-x64_6_0.exe")
                 rInstall = os.path.join(installationsDir, "R-3.3.2-win.exe")
                 postgreInstall = os.path.join(installationsDir, "postgresql-9.3.6-2-windows-x64.exe")
                 postgisInstall = os.path.join(installationsDir, "postgis-bundle-pg93x64-setup-2.1.5-2.exe")
