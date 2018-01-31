@@ -129,7 +129,6 @@ class Installer():
 
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
-            # pip installations
             dirPath = str(self.dialog.dirPathText.toPlainText())
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
@@ -161,6 +160,7 @@ class Installer():
                 # show dialog because it might take some time on slower computers
                 self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
                 self.showDialog()
+
             # additional python modules
             site_packages = os.path.join(dirPath, 'apps', 'Python27', 'Lib', 'site-packages')
             # install fmask and rios
