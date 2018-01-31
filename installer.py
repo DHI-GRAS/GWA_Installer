@@ -130,6 +130,7 @@ class Installer():
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
             dirPath = str(self.dialog.dirPathText.toPlainText())
+
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
             srcPath = os.path.join("QGIS additional software", "plugins.zip")
@@ -147,9 +148,9 @@ class Installer():
             for plugin in plugins_to_delete:
                 self.util.deleteDir(
                         os.path.join(dstPath, plugin))
-            # show dialog because it might take some time on slower computers
             self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
+
             # copy scripts and models
             QGIS_extras_dir = os.path.abspath("QGIS additional software")
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
@@ -163,14 +164,11 @@ class Installer():
 
             # additional python modules
             site_packages = os.path.join(dirPath, 'apps', 'Python27', 'Lib', 'site-packages')
-            # install fmask and rios
-            srcPath = os.path.join(QGIS_extras_dir, 'fmask-rios.zip')
-            self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
-            self.showDialog()
-            # install cv2
-            srcPath = os.path.join(QGIS_extras_dir, 'cv2.zip')
-            self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
-            self.showDialog()
+            for zipfname in [
+                    'fmask-rios.zip', 'cv2.zip', 'RSUtils.zip']:
+                srcPath = os.path.join(QGIS_extras_dir, zipfname)
+                self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
+                self.showDialog()
 
             # activate plugins and processing providers
             self.util.activatePlugins()
