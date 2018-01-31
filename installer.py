@@ -23,24 +23,32 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 ***************************************************************************
 """
-from PyQt4 import QtCore, QtGui
-from installerGUI import installerWelcomeWindow, beamInstallWindow, beamPostInstallWindow, snapInstallWindow, snapPostInstallWindow
-from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow, rInstallWindow, postgreInstallWindow, postgisInstallWindow
-from installerGUI import finishWindow
-from installerGUI import extractingWaitWindow, copyingWaitWindow, cmdWaitWindow, uninstallInstructionsWindow, rPostInstallWindow
-from installerGUI import CANCEL, SKIP, NEXT
 import os
 import sys
 import re
 import glob
 import errno
 import shutil
+import functools
 import subprocess
 import traceback
 import tempfile
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 from distutils import dir_util
+
+from PyQt4 import QtCore, QtGui
+from installerGUI import installerWelcomeWindow
+from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow
+from installerGUI import beamInstallWindow, beamPostInstallWindow
+from installerGUI import snapInstallWindow, snapPostInstallWindow
+from installerGUI import rInstallWindow, rPostInstallWindow
+from installerGUI import postgreInstallWindow, postgisInstallWindow
+from installerGUI import budykoInstallWindow
+from installerGUI import extractingWaitWindow, copyingWaitWindow
+from installerGUI import cmdWaitWindow, uninstallInstructionsWindow
+from installerGUI import finishWindow
+from installerGUI import CANCEL, SKIP, NEXT
 
 import installer_utils
 
@@ -62,23 +70,29 @@ class Installer():
             if os.path.isdir(installationsDirs[0]):
                 is32bit = True
                 installationsDir = installationsDirs[0]
-                osgeo4wInstall = os.path.join(installationsDir, "osgeo4w-setup.bat")
-                beamInstall = os.path.join(installationsDir, "beam_5.0_win32_installer.exe")
-                snapInstall = os.path.join(installationsDir, "esa-snap_sentinel_windows_6_0.exe")
-                rInstall = os.path.join(installationsDir, "R-3.3.2-win.exe")
-                postgreInstall = os.path.join(installationsDir, "postgresql-9.3.6-2-windows.exe")
-                postgisInstall = os.path.join(installationsDir, "postgis-bundle-pg93x32-setup-2.1.5-1.exe")
+                _joinbindir = functools.partial(os.path.join, installationsDir)
+                osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
+                beamInstall = _joinbindir("beam_5.0_win32_installer.exe")
+                snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
+                rInstall = _joinbindir("R-3.3.2-win.exe")
+                postgreInstall = _joinbindir("postgresql-9.3.6-2-windows.exe")
+                postgisInstall = _joinbindir("postgis-bundle-pg93x32-setup-2.1.5-1.exe")
+                mpiInstall = None
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
-                osgeo4wInstall = os.path.join(installationsDir, "osgeo4w-setup.bat")
-                beamInstall = os.path.join(installationsDir, "beam_5.0_win64_installer.exe")
-                snapInstall = os.path.join(installationsDir, "esa-snap_sentinel_windows-x64_6_0.exe")
-                rInstall = os.path.join(installationsDir, "R-3.3.2-win.exe")
-                postgreInstall = os.path.join(installationsDir, "postgresql-9.3.6-2-windows-x64.exe")
-                postgisInstall = os.path.join(installationsDir, "postgis-bundle-pg93x64-setup-2.1.5-2.exe")
+                _joinbindir = functools.partial(os.path.join, installationsDir)
+                osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
+                beamInstall = _joinbindir("beam_5.0_win64_installer.exe")
+                snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
+                rInstall = _joinbindir("R-3.3.2-win.exe")
+                postgreInstall = _joinbindir("postgresql-9.3.6-2-windows-x64.exe")
+                postgisInstall = _joinbindir("postgis-bundle-pg93x64-setup-2.1.5-2.exe")
+                mpiInstall = _joinbindir('msmpisdk.msi')
             else:
-                self.util.error_exit('Neither 32 bit nor 64 bit instalations directory exists. Package incomplete.')
+                self.util.error_exit(
+                    'Neither 32 bit nor 64 bit instalations directory exists. '
+                    'Package incomplete.')
                 return
             # select default installation directories for 32 or 64 bit install
             if is32bit:
@@ -207,13 +221,14 @@ class Installer():
         # copy the additional BEAM modules and set the amount of memory to be used with GPT
         if res == NEXT:
             dirPath = str(self.dialog.dirPathText.toPlainText())
-            dstPath = os.path.join(dirPath,"modules")
+            dstPath = os.path.join(dirPath, "modules")
             srcPath = "BEAM additional modules"
-            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath) # show dialog because it might take some time on slower computers
+            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
             # 32 bit systems usually have less RAM so assign less to BEAM
             ram_fraction = 0.4 if is32bit else 0.6
-            installer_utils.modifyRamInBatFiles(os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
+            installer_utils.modifyRamInBatFiles(
+                os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
             self.util.activateBEAMplugin(dirPath)
         elif res == SKIP:
             pass
@@ -232,8 +247,6 @@ class Installer():
         # run the Snap installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(snapInstall)
-            #self.dialog =  snapPostInstallWindow(snapDefaultDir);
-            #res = self.showDialog()
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -258,8 +271,6 @@ class Installer():
             dstPath = os.path.join(os.path.expanduser("~"), ".snap")
             srcPath = "SNAP additional modules"
             self.util.copyFiles(srcPath, dstPath)
-            #self.dialog = copyingWaitWindow(self.util, srcPath, dstPath) # show dialog because it might take some time on slower computers
-            #self.showDialog()
 
             # 32 bit systems usually have less RAM so assign less to S1 Toolbox
             ram_fraction = 0.4 if is32bit else 0.6
@@ -304,10 +315,11 @@ class Installer():
         # Copy the R additional libraries
         if res == NEXT:
             dirPath = str(self.dialog.dirPathText.toPlainText())
-            dstPath = os.path.join(dirPath,"library")
+            dstPath = os.path.join(dirPath, "library")
             srcPath = "R additional libraries"
             # show dialog because it might take some time on slower computers
-            self.dialog = extractingWaitWindow(self.util, os.path.join(srcPath, "libraries.zip"), dstPath)
+            self.dialog = extractingWaitWindow(
+                self.util, os.path.join(srcPath, "libraries.zip"), dstPath)
             self.showDialog()
             if is32bit:
                 self.util.activateRplugin(dirPath, "false")
@@ -359,12 +371,30 @@ class Installer():
         self.showDialog()
         del self.dialog
 
+        ########################################################################
+        # Install MPI
+
+        self.dialog = budykoInstallWindow()
+        res = self.showDialog()
+
+        if res == NEXT:
+            self.util.install_msi(mpiInstall)
+        elif res == SKIP:
+            pass
+        elif res == CANCEL:
+            del self.dialog
+            return
+        else:
+            self.unknownActionPopup()
+
     def showDialog(self):
         return(self.dialog.exec_())
 
     def unknownActionPopup(self):
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Unknown action chosen in the previous installation step. Ask the developer to check the installation script!\n\n Quitting installation")
+        msgBox.setText(
+            "Unknown action chosen in the previous installation step. "
+            "Ask the developer to check the installation script!\n\n Quitting installation")
         msgBox.exec_()
 
 
@@ -384,7 +414,9 @@ class Utilities(QtCore.QObject):
         # command should be a path to an exe file so check if it exists
         if not os.path.isfile(command):
             msgBox = QtGui.QMessageBox()
-            msgBox.setText("Could not find the installation file for this component!\n\n Skipping to next component")
+            msgBox.setText(
+                "Could not find the installation file for this component!\n\n "
+                "Skipping to next component")
             msgBox.exec_()
             # self.dialog.action = SKIP
             return
@@ -401,7 +433,8 @@ class Utilities(QtCore.QObject):
 
     def execute_cmd(self, cmd):
         """Execute cmd and save output to log file"""
-        with tempfile.NamedTemporaryFile(prefix='gwa_installer_', suffix='.log', delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+                prefix='gwa_installer_', suffix='.log', delete=False) as f:
             output = ''
             try:
                 si = subprocess.STARTUPINFO()
@@ -414,7 +447,9 @@ class Utilities(QtCore.QObject):
             except:
                 trace = traceback.format_exc()
                 msgBox = QtGui.QMessageBox()
-                msgBox.setText("An error occurred: {}. Log written to \'{}\'.".format(trace, f.name))
+                msgBox.setText(
+                    "An error occurred: {}. Log written to \'{}\'."
+                    .format(trace, f.name))
                 msgBox.exec_()
                 f.write(trace)
 
@@ -427,6 +462,12 @@ class Utilities(QtCore.QObject):
                     msgBox.exec_()
 
         self.finished.emit()
+
+    def install_msi(self, msipath):
+        logfname = os.path.splitext(os.path.basename(msipath))[0] + '_gwa_install.log'
+        logpath = os.path.join(tempfile.gettempdir(), logfname)
+        cmd = 'msiexec /passive /norestart /i {msipath} /log {logpath}'.format(msipath, logpath)
+        self.execute_cmd(cmd)
 
     def deleteFile(self, filePath):
         try:
@@ -452,14 +493,19 @@ class Utilities(QtCore.QObject):
         # its parent exists
         if checkDstParentExists:
             if not os.path.isdir(os.path.dirname(dstPath)):
-                self.error_exit("Could not find the destination directory!\n\n No files were copied.")
+                self.error_exit(
+                    "Could not find the destination directory!\n\n "
+                    "No files were copied.")
                 return
 
         # checkWritePremissions alsoe creates the directory if it doesn't exist yet
         if not self.checkWritePermissions(dstPath):
-            self.error_exit("You do not have permissions to write to destination directory!\n\n No files were copied.\n\n" +
-                            "Re-run the installer with administrator privileges or manually copy files from "+srcPath +
-                            " to "+dstPath+" after the installation process is over.")
+            self.error_exit(
+                "You do not have permissions to write to destination directory!\n\n "
+                "No files were copied.\n\n"
+                "Re-run the installer with administrator privileges or manually "
+                "copy files from {} to {} to  after the installation process is over."
+                .format(srcPath, dstPath))
             return
 
         # for directories copy the whole directory recursively
@@ -483,9 +529,11 @@ class Utilities(QtCore.QObject):
         # checkWritePremissions also creates the directory if it doesn't exist yet
         if not self.checkWritePermissions(dstPath):
             self.error_exit(
-                "You do not have permissions to write to destination directory!\n\n No files were copied.\n\n" +
-                "Re-run the installer with administrator privileges or manually unzip files from " + archivePath +
-                " to "+dstPath+" after the installation process is over.")
+                "You do not have permissions to write to destination directory!\n\n "
+                "No files were copied.\n\n" +
+                "Re-run the installer with administrator privileges or manually unzip "
+                "files from {} to {} to after the installation process is over."
+                .format(archivePath, dstPath))
             return
 
         archive = ZipFile(archivePath)
@@ -497,7 +545,7 @@ class Utilities(QtCore.QObject):
         try:
             if not os.path.isdir(dstPath):
                 os.makedirs(dstPath)
-            fp = open(os.path.join(dstPath,"test"), 'w')
+            fp = open(os.path.join(dstPath, "test"), 'w')
         except IOError as e:
             if e.errno == errno.EACCES:
                 return False
@@ -506,7 +554,7 @@ class Utilities(QtCore.QObject):
         else:
             fp.close()
             try:
-                os.remove(os.path.join(dstPath,"test"))
+                os.remove(os.path.join(dstPath, "test"))
             except:
                 pass
             return True
@@ -515,11 +563,13 @@ class Utilities(QtCore.QObject):
         # Make sure the snap batch file exists in the given directory
         if not os.path.isfile(batFilePath):
             msgBox = QtGui.QMessageBox()
-            msgBox.setText("Could not find the batch file!\n\n Could not modify Java VM options.")
+            msgBox.setText(
+                "Could not find the batch file!\n\n Could not modify Java VM options.")
             msgBox.exec_()
             return
 
-        # In the batch file remove the "-XX:+UseLoopPredicate" option which doesn't work with 32 bit installation.
+        # In the batch file remove the "-XX:+UseLoopPredicate"
+        # option which doesn't work with 32 bit installation.
         # First do this in a temp file and then copy the temp file to the correct dir
         tempFile = NamedTemporaryFile(delete=False)
         tempFilePath = tempFile.name

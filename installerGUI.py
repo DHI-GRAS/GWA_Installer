@@ -270,6 +270,18 @@ class postgisInstallWindow(installWindow):
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostGIS installer will start. You need to accept the license and then when choosing components to install select 'PostGIS' <b>but not 'Create spatial database'</b>. If any questions pop up just click Yes.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
+# Budyko Hydrological Model
+class budykoInstallWindow(installWindow):
+    def __init__(self):
+        installWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
+
+    def retranslateUi(self, MainWindow):
+        super(snapInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate("MainWindow", "The Budyko Hydrological Model is used to simulate hydrological processes.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "The installation of Windows MPI and other dependencies requires no user interaction. Just click \"Continue\".", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Budyko Hydrological Model", None))
+
 
 # Finish
 class finishWindow(instructionsWindow):
