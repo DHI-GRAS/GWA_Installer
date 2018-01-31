@@ -26,9 +26,9 @@
 from PyQt4 import QtCore, QtGui
 from installerGUI import installerWelcomeWindow, beamInstallWindow, beamPostInstallWindow, snapInstallWindow, snapPostInstallWindow
 from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow, rInstallWindow, postgreInstallWindow, postgisInstallWindow
-from installerGUI import mapwindowInstallWindow, mwswatInstallWindow, mwswatPostInstallWindow, swateditorInstallWindow, finishWindow
+from installerGUI import finishWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow, cmdWaitWindow, uninstallInstructionsWindow, rPostInstallWindow
-from installerGUI import CANCEL,SKIP,NEXT
+from installerGUI import CANCEL, SKIP, NEXT
 import os
 import sys
 import re
@@ -38,12 +38,12 @@ import shutil
 import subprocess
 import traceback
 import tempfile
-import time
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 from distutils import dir_util
 
 import installer_utils
+
 
 class Installer():
 
@@ -68,9 +68,6 @@ class Installer():
                 rInstall = os.path.join(installationsDir, "R-3.3.2-win.exe")
                 postgreInstall = os.path.join(installationsDir, "postgresql-9.3.6-2-windows.exe")
                 postgisInstall = os.path.join(installationsDir, "postgis-bundle-pg93x32-setup-2.1.5-1.exe")
-                mapwindowInstall = os.path.join(installationsDir, "MapWindowx86Full-v488SR-installer.exe")
-                mwswatInstall = os.path.join(installationsDir, "MWSWAT2009.exe")
-                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -80,9 +77,6 @@ class Installer():
                 rInstall = os.path.join(installationsDir, "R-3.3.2-win.exe")
                 postgreInstall = os.path.join(installationsDir, "postgresql-9.3.6-2-windows-x64.exe")
                 postgisInstall = os.path.join(installationsDir, "postgis-bundle-pg93x64-setup-2.1.5-2.exe")
-                mapwindowInstall = os.path.join(installationsDir, "MapWindowx86Full-v488SR-installer.exe")
-                mwswatInstall = os.path.join(installationsDir, "MWSWAT2009.exe")
-                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             else:
                 self.util.error_exit('Neither 32 bit nor 64 bit instalations directory exists. Package incomplete.')
                 return
@@ -91,13 +85,11 @@ class Installer():
                 osgeo4wDefaultDir = "C:\\OSGeo4W"
                 snapDefaultDir = "C:\\Program Files\\snap"
                 beamDefaultDir = "C:\\Program Files\\beam-5.0"
-                mapwindowDefaultDir = "C:\\Program Files\\MapWindow"
                 rDefaultDir = "C:\\Program Files\\R\\R-3.3.2"
             else:
                 osgeo4wDefaultDir = "C:\\OSGeo4W64"
                 snapDefaultDir = "C:\\Program Files\\snap"
                 beamDefaultDir = "C:\\Program Files\\beam-5.0"
-                mapwindowDefaultDir = "C:\\Program Files (x86)\\MapWindow"
                 rDefaultDir = "C:\\Program Files\\R\\R-3.3.2"
 
         elif res == CANCEL:
@@ -149,7 +141,6 @@ class Installer():
                 'processing_gpf',
                 'photo2shape',
                 'processing_workflow',
-                'processing_SWAT',
                 'openlayers_plugin',
                 'pointsamplingtool',
                 'temporalprofiletool',
@@ -365,99 +356,6 @@ class Installer():
             else:
                 self.unknownActionPopup()
 
-        ########################################################################
-        # Install MapWindow, SWAT and PEST
-        mapwindow_installed = False
-        mswat_installed = False
-        swateditor_installed = False
-
-        # install MapWindow
-        self.dialog = mapwindowInstallWindow()
-        res = self.showDialog()
-        if res == NEXT:
-            self.util.execSubprocess(mapwindowInstall)
-            mapwindow_installed = True
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
-
-        if mapwindow_installed:
-            # install MS SWAT
-            self.dialog = mwswatInstallWindow()
-            res = self.showDialog()
-            if res == NEXT:
-                self.util.execSubprocess(mwswatInstall)
-                mswat_installed = True
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-
-        if mswat_installed:
-            # install SWAT editor
-            self.dialog = swateditorInstallWindow()
-            res = self.showDialog()
-            if res == NEXT:
-                self.util.execSubprocess(swateditorInstall)
-                time.sleep(5)
-                swateditor_installed = True
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-
-        if swateditor_installed:
-            # install SWAT post-installation stuff
-            self.dialog = mwswatPostInstallWindow(mapwindowDefaultDir)
-            res = self.showDialog()
-            if res == NEXT:
-                # copy the DTU customised MWSWAT 2009 installation
-                dirPath = str(self.dialog.dirPathText.toPlainText())
-                mwswatPath = os.path.join(dirPath,"Plugins","MWSWAT2009")
-                dstPath = os.path.join(mwswatPath,'swat2009DtuEnvVers0.2')
-                srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
-                self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
-                self.showDialog()
-
-                # copy and rename the customised MWSWAT exe
-                oldexe = os.path.join(mwswatPath,"swat2009rev481.exe_old")
-                revexe = os.path.join(mwswatPath,"swat2009rev481.exe")
-                newexe = os.path.join(dstPath, "swat2009DtuEnv.exe")
-
-                if os.path.isfile(oldexe):
-                    os.remove(oldexe)
-                os.rename(revexe, oldexe)
-
-                self.util.copyFiles(newexe, mwswatPath)
-                if os.path.isfile(revexe):
-                    os.remove(revexe)
-                os.rename(newexe, revexe)
-
-                # copy the modified database file
-                self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
-                # copy PEST
-                self.dialog = copyingWaitWindow(self.util, "MWSWAT additional software\\PEST", os.path.join(mwswatPath,"PEST"))
-                self.showDialog()
-                # activate the plugin
-                self.util.activateSWATplugin(dirPath)
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-
         # Finish
         self.dialog = finishWindow()
         self.showDialog()
@@ -510,10 +408,11 @@ class Utilities(QtCore.QObject):
             try:
                 si = subprocess.STARTUPINFO()
                 si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                output = subprocess.check_output(cmd,
-                        stdin=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        startupinfo=si)
+                output = subprocess.check_output(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    startupinfo=si)
             except:
                 trace = traceback.format_exc()
                 msgBox = QtGui.QMessageBox()
@@ -585,9 +484,10 @@ class Utilities(QtCore.QObject):
 
         # checkWritePremissions also creates the directory if it doesn't exist yet
         if not self.checkWritePermissions(dstPath):
-            self.error_exit("You do not have permissions to write to destination directory!\n\n No files were copied.\n\n" +
-                           "Re-run the installer with administrator privileges or manually unzip files from " + archivePath +
-                           " to "+dstPath+" after the installation process is over.")
+            self.error_exit(
+                "You do not have permissions to write to destination directory!\n\n No files were copied.\n\n" +
+                "Re-run the installer with administrator privileges or manually unzip files from " + archivePath +
+                " to "+dstPath+" after the installation process is over.")
             return
 
         archive = ZipFile(archivePath)
@@ -680,7 +580,9 @@ class Utilities(QtCore.QObject):
         # GRASS_FOLDER depends on GRASS version and must be set explicitly here
         try:
             grass_root = os.path.join(osgeo4wDefaultDir, 'apps', 'grass')
-            grass_folders = sorted([d for d in glob.glob(os.path.join(grass_root, 'grass-*')) if os.path.isdir(d)])
+            grass_folders = sorted([
+                d for d in glob.glob(os.path.join(grass_root, 'grass-*'))
+                if os.path.isdir(d)])
             grassFolder = grass_folders[-1]
             self.setQGISSettings("Processing/configuration/GRASS_FOLDER", grassFolder)
         except (IndexError, OSError):
@@ -706,12 +608,6 @@ class Utilities(QtCore.QObject):
                 "Processing/configuration/ACTIVATE_R")
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
-
-    def activateSWATplugin(self, dirPath):
-        self.activateThis(
-                "PythonPlugins/processing_SWAT",
-                "Processing/configuration/ACTIVATE_WG9HM")
-        self.setQGISSettings("Processing/configuration/MAPWINDOW_FOLDER", dirPath)
 
 
 if __name__ == '__main__':
