@@ -255,7 +255,7 @@ class postgreInstallWindow(installWindow):
     def retranslateUi(self, MainWindow):
         super(postgreInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by GWA Toolbox for storing certain types of data. It is not necessary to have it installed on every computer using GWA Toolbox, since the database can run from a central server. Therefore its installation is optional.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer will start. You can keep all the default options and set superuser password (e.g. waterinfo) when requested. <b>Remember to write down the superuser name and the password.</b> In the last step make sure that the option to launch Stack Builder is <b>NOT</b> selected.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer will start. We recommend that you keep all the default options and use <b>\"postgres\"</b> for both username and password (and remember this choice). In the last step make sure that the option to launch Stack Builder is <b>NOT</b> selected.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
 # PostGIS
