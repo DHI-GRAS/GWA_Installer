@@ -44,7 +44,6 @@ from installerGUI import beamInstallWindow, beamPostInstallWindow
 from installerGUI import snapInstallWindow, snapPostInstallWindow
 from installerGUI import rInstallWindow, rPostInstallWindow
 from installerGUI import postgreInstallWindow, postgisInstallWindow
-from installerGUI import budykoInstallWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow
 from installerGUI import cmdWaitWindow, uninstallInstructionsWindow
 from installerGUI import finishWindow
@@ -77,7 +76,6 @@ class Installer():
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 postgreInstall = _joinbindir("postgresql-9.3.6-2-windows.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg93x32-setup-2.1.5-1.exe")
-                mpiInstall = None
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -88,7 +86,6 @@ class Installer():
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 postgreInstall = _joinbindir("postgresql-9.3.6-2-windows-x64.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg93x64-setup-2.1.5-2.exe")
-                mpiInstall = _joinbindir('msmpisdk.msi')
             else:
                 self.util.error_exit(
                     'Neither 32 bit nor 64 bit instalations directory exists. '
@@ -370,22 +367,6 @@ class Installer():
         self.dialog = finishWindow()
         self.showDialog()
         del self.dialog
-
-        ########################################################################
-        # Install MPI
-
-        self.dialog = budykoInstallWindow()
-        res = self.showDialog()
-
-        if res == NEXT:
-            self.util.install_msi(mpiInstall)
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
 
     def showDialog(self):
         return(self.dialog.exec_())
