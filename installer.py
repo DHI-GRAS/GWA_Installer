@@ -278,6 +278,19 @@ class Installer():
             self.dialog = cmdWaitWindow(self.util, cmd, notify=True)
             self.showDialog()
 
+            snappy_ini = os.path.join(site_packages_dir, 'snappy.ini')
+            with open(snappy_ini, 'w') as f:
+                f.write(
+                    '[DEFAULT]\n'
+                    'snap_home: {}\n'
+                    .format(install_dirs['snap']))
+
+            jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
+            replace = {
+                'java_home': '"{}"'.format(os.path.join(install_dirs['snap'], 'jre')),
+                'jvm_dll': 'None'}
+            installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
+
             # 32 bit systems usually have less RAM so assign less to S1 Toolbox
             ram_fraction = 0.4 if is32bit else 0.6
             settingsfile = os.path.join(install_dirs['snap'], 'bin', 'gpt.vmoptions')

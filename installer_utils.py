@@ -123,6 +123,23 @@ def removeIncompatibleJavaOptions(self, batFilePath):
     shutil.copy(tempgpt, batFilePath)
 
 
+def fix_jpyconfig(path, replace):
+    if not os.path.isfile(path):
+        return
+    path_backup = path + '.backup'
+    shutil.move(path, path_backup)
+    try:
+        with open(path, 'w') as fout, open(path_backup, 'r') as fin:
+            for line in fin:
+                for key, value in replace.items():
+                    if key in line:
+                        line = re.sub('\=.*', '= {}'.format(value), line.rstrip()) + '\n'
+                        break
+                fout.write(line)
+    except:
+        shutil.move(path_backup, path)
+
+
 def check_file_exists(filepath):
     if not os.path.isfile(filepath):
         msgBox = QtGui.QMessageBox()
