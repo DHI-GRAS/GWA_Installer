@@ -1,21 +1,23 @@
 import os
-import sys
 import re
+import sys
 import shutil
+import tempfile
+import ctypes
+import ctypes.wintypes
+
 from PyQt4 import QtGui
 
-import ctypes
-from ctypes import wintypes
 
-def _ram():
+def _get_ram():
     """Get amount of physical memory"""
     kernel32 = ctypes.windll.kernel32
     c_ulonglong = ctypes.c_ulonglong
 
     class MEMORYSTATUSEX(ctypes.Structure):
         _fields_ = [
-            ('dwLength', wintypes.DWORD),
-            ('dwMemoryLoad', wintypes.DWORD),
+            ('dwLength', ctypes.wintypes.DWORD),
+            ('dwMemoryLoad', ctypes.wintypes.DWORD),
             ('ullTotalPhys', c_ulonglong),
             ('ullAvailPhys', c_ulonglong),
             ('ullTotalPageFile', c_ulonglong),
@@ -35,16 +37,20 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
     # Check how much RAM the system has. Only works in Windows
     if sys.platform != 'win32':
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("This installer is only meant for Windows!\n\n The installed GWA Toolbox might not work properly.")
+        msgBox.setText(
+            "This installer is only meant for Windows!\n\n "
+            "The installed GWA Toolbox might not work properly.")
         msgBox.exec_()
         return
-    totalRam = _ram()
+    totalRam = _get_ram()
     totalRam = totalRam / (1024*1024)
 
     # Make sure the BEAM/SNAP batch file exists in the given directory
     if not os.path.isfile(batFilePath):
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Could not find the batch file!\n\n The amount of RAM available to the program was not changed.")
+        msgBox.setText(
+            "Could not find the batch file!\n\n "
+            "The amount of RAM available to the program was not changed.")
         msgBox.exec_()
         return
 
@@ -57,7 +63,7 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
         backupfile = batFilePath + '.backup'
         try:
             os.remove(backupfile)
-        except WindowsError:
+        except OSError:
             pass
         shutil.move(batFilePath, backupfile)
         try:
@@ -78,7 +84,7 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
         backupfile = batFilePath + '.backup'
         try:
             os.remove(backupfile)
-        except WindowsError:
+        except OSError:
             pass
         shutil.move(batFilePath, backupfile)
         try:
@@ -94,10 +100,35 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
             raise
 
 
+def removeIncompatibleJavaOptions(self, batFilePath):
+    # Make sure the snap batch file exists in the given directory
+    if not os.path.isfile(batFilePath):
+        raise IOError('batch file does not exist: {}'.format(batFilePath))
+
+    # In the batch file remove the "-XX:+UseLoopPredicate"
+    # option which doesn't work with 32 bit installation.
+    # First do this in a temp file and then copy the temp file to the correct dir
+    tempFile = tempfile.NamedTemporaryFile(delete=False)
+    tempFilePath = tempFile.name
+    tempFile.close()
+    with open(tempFilePath, 'w') as outfile, open(batFilePath, 'r') as infile:
+        for line in infile:
+            line = re.sub(r"-XX:\+UseLoopPredicate ", "", line)
+            outfile.write(line)
+    tempDir = os.path.dirname(tempFilePath)
+    tempgpt = os.path.join(tempDir, "gpt.bat")
+    if os.path.isfile(tempgpt):
+        os.remove(tempgpt)
+    os.rename(tempFilePath, tempgpt)
+    shutil.copy(tempgpt, batFilePath)
+
+
 def check_file_exists(filepath):
     if not os.path.isfile(filepath):
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Could not find the required file \'{}\'.\n\n Skipping this step.".format(filepath))
+        msgBox.setText(
+            "Could not find the required file \'{}\'.\n\n "
+            "Skipping this step.".format(filepath))
         msgBox.exec_()
         return False
     else:
