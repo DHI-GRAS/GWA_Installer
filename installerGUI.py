@@ -23,6 +23,7 @@
 * with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 ***************************************************************************
 """
+import os
 
 from PyQt4 import QtCore, QtGui
 from ui import welcomeDialog, installComponentDialog, postInstallComponentDialog, componentInstructionsDialog
@@ -278,24 +279,29 @@ class finishWindow(instructionsWindow):
 
     def retranslateUi(self, MainWindow):
         super(finishWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "The GWA Toolbox has now been installed on your computer. Thank you.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "You can now start QGIS to begin working with the GWA Toolbox.", None))
+        self.topLabel.setText(_translate(
+            "MainWindow", "The GWA Toolbox has now been installed on your computer. Thank you.", None))
+        self.instructionsMainLabel.setText(_translate(
+            "MainWindow", "You can now start QGIS to begin working with the GWA Toolbox.", None))
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
-        self.instructionsFooterLabel.setText(_translate("MainWindow", "Click \"Finish\" to finish the installation process", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Finished", None))
+        self.instructionsFooterLabel.setText(_translate(
+            "MainWindow", "Click \"Finish\" to finish the installation process", None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", "GWA Toolbox Installation - Finished", None))
         self.cancelButton.setText(_translate("MainWindow", "Finish", None))
 
 
 # cmd please wait
 class cmdWaitWindow(instructionsWindow, QtCore.QObject):
 
-    def __init__(self, utilities, cmd):
+    def __init__(self, utilities, cmd, **kwargs):
         QtCore.QObject.__init__(self)
 
         self.utilities = utilities
         self.cmd = cmd
+        self.execute_kwargs = kwargs
 
         # Use a thread and modified QDialog to display the waiting dialog and
         # run the cmd at the same time
@@ -310,17 +316,19 @@ class cmdWaitWindow(instructionsWindow, QtCore.QObject):
 
     def retranslateUi(self, MainWindow):
         super(cmdWaitWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "Running an external install command. Please wait...", None))
+        self.topLabel.setText(_translate(
+            "MainWindow", "Running an external install command. Please wait...", None))
         self.instructionsMainLabel.setVisible(False)
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setVisible(False)
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Running install command.", None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", "GWA Toolbox Installation - Running install command.", None))
         self.cancelButton.setVisible(False)
 
     def startAction(self):
-        self.utilities.execute_cmd(self.cmd)
+        self.utilities.execute_cmd(self.cmd, **self.execute_kwargs)
 
     def slotFinished(self):
         self.action = NEXT
@@ -350,7 +358,10 @@ class extractingWaitWindow(instructionsWindow, QtCore.QObject):
 
     def retranslateUi(self, MainWindow):
         super(extractingWaitWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "Extracting an archive. Please wait...", None))
+        self.topLabel.setText(
+            _translate("MainWindow",
+                       "Extracting an archive ({}). Please wait...".format(os.path.splitext(os.path.basename(self.archivePath))[0]),
+                       None))
         self.instructionsMainLabel.setVisible(False)
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)

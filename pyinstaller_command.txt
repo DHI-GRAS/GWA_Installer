@@ -1,1 +1,2 @@
-pyinstaller installer.py -F -w -i GWA.ico 
+pyinstaller installer.py -F -w -i GWA.ico --uac-admin 
+cp build\installer.exe.manifest dist\

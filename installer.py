@@ -25,7 +25,6 @@
 """
 import os
 import sys
-import re
 import glob
 import errno
 import shutil
@@ -33,7 +32,6 @@ import functools
 import subprocess
 import traceback
 import tempfile
-from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 from distutils import dir_util
 
@@ -45,7 +43,8 @@ from installerGUI import snapInstallWindow, snapPostInstallWindow
 from installerGUI import rInstallWindow, rPostInstallWindow
 from installerGUI import postgreInstallWindow, postgisInstallWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow
-from installerGUI import cmdWaitWindow, uninstallInstructionsWindow
+from installerGUI import cmdWaitWindow
+from installerGUI import uninstallInstructionsWindow
 from installerGUI import finishWindow
 from installerGUI import CANCEL, SKIP, NEXT
 
@@ -93,15 +92,17 @@ class Installer():
                 return
             # select default installation directories for 32 or 64 bit install
             if is32bit:
-                osgeo4wDefaultDir = "C:\\OSGeo4W"
-                snapDefaultDir = "C:\\Program Files\\snap"
-                beamDefaultDir = "C:\\Program Files\\beam-5.0"
-                rDefaultDir = "C:\\Program Files\\R\\R-3.3.2"
+                install_dirs = {
+                    'osgeo4w': "C:\\OSGeo4W",
+                    'snap': "C:\\Program Files\\snap",
+                    'beam': "C:\\Program Files\\beam-5.0",
+                    'r': "C:\\Program Files\\R\\R-3.3.2"}
             else:
-                osgeo4wDefaultDir = "C:\\OSGeo4W64"
-                snapDefaultDir = "C:\\Program Files\\snap"
-                beamDefaultDir = "C:\\Program Files\\beam-5.0"
-                rDefaultDir = "C:\\Program Files\\R\\R-3.3.2"
+                install_dirs = {
+                    'osgeo4w': "C:\\OSGeo4W64",
+                    'snap': "C:\\Program Files\\snap",
+                    'beam': "C:\\Program Files\\beam-5.0",
+                    'r': "C:\\Program Files\\R\\R-3.3.2"}
 
         elif res == CANCEL:
             del self.dialog
@@ -135,12 +136,12 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = osgeo4wPostInstallWindow(osgeo4wDefaultDir)
+        self.dialog = osgeo4wPostInstallWindow(install_dirs['osgeo4w'])
         res = self.showDialog()
 
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
-            dirPath = str(self.dialog.dirPathText.toPlainText())
+            install_dirs['osgeo4w'] = str(self.dialog.dirPathText.toPlainText())
 
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
@@ -158,7 +159,7 @@ class Installer():
                 'valuetool']
             for plugin in plugins_to_delete:
                 self.util.deleteDir(
-                        os.path.join(dstPath, plugin))
+                    os.path.join(dstPath, plugin))
             self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
 
@@ -173,17 +174,23 @@ class Installer():
                 self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
                 self.showDialog()
 
-            # additional python modules
-            site_packages = os.path.join(dirPath, 'apps', 'Python27', 'Lib', 'site-packages')
-            for zipfname in [
-                    'fmask-rios.zip', 'cv2.zip', 'RSUtils.zip']:
-                srcPath = os.path.join(QGIS_extras_dir, zipfname)
-                self.dialog = extractingWaitWindow(self.util, srcPath, site_packages)
+            # copy additional python packages
+            site_packages_dir = os.path.join(
+                install_dirs['osgeo4w'], 'apps', 'Python27', 'Lib', 'site-packages')
+            python_packages = glob.glob(os.path.join(QGIS_extras_dir, 'python_packages', '*.zip'))
+            for zipfname in python_packages:
+                self.dialog = extractingWaitWindow(self.util, zipfname, site_packages_dir)
                 self.showDialog()
+
+            # install additional python packages with pip
+            pip_package_dir = os.path.join(QGIS_extras_dir, 'python_packages_pip')
+            self.util.install_pip_offline(
+                osgeo_root=install_dirs['osgeo4w'],
+                package_dir=pip_package_dir)
 
             # activate plugins and processing providers
             self.util.activatePlugins()
-            self.util.activateProcessingProviders(osgeo4wDefaultDir)
+            self.util.activateProcessingProviders(install_dirs['osgeo4w'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -201,7 +208,7 @@ class Installer():
         # run the BEAM installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(beamInstall)
-            # self.dialog =  beamPostInstallWindow(beamDefaultDir);
+            # self.dialog =  beamPostInstallWindow(install_dirs['beam']);
             # res = self.showDialog()
         elif res == SKIP:
             pass
@@ -212,20 +219,23 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = beamPostInstallWindow(beamDefaultDir)
+        self.dialog = beamPostInstallWindow(install_dirs['beam'])
         res = self.showDialog()
 
         # copy the additional BEAM modules and set the amount of memory to be used with GPT
         if res == NEXT:
-            dirPath = str(self.dialog.dirPathText.toPlainText())
+            dirPath = install_dirs['beam'] = str(self.dialog.dirPathText.toPlainText())
             dstPath = os.path.join(dirPath, "modules")
             srcPath = "BEAM additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
             # 32 bit systems usually have less RAM so assign less to BEAM
             ram_fraction = 0.4 if is32bit else 0.6
-            installer_utils.modifyRamInBatFiles(
-                os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
+            try:
+                installer_utils.modifyRamInBatFiles(
+                    os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
+            except IOError as exc:
+                self.util.error_exit(str(exc))
             self.util.activateBEAMplugin(dirPath)
         elif res == SKIP:
             pass
@@ -253,31 +263,49 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = snapPostInstallWindow(snapDefaultDir)
+        self.dialog = snapPostInstallWindow(install_dirs['snap'])
         res = self.showDialog()
 
         # Set the amount of memory to be used with NEST GPT
         if res == NEXT:
-            dirPath = str(self.dialog.dirPathText.toPlainText())
-            confbat = os.path.join(dirPath, 'bin', 'snappy-conf.bat')
-            osgeopython = os.path.join(osgeo4wDefaultDir, 'bin', 'python.exe')
-            cmd = [confbat, osgeopython]
-            # show dialog because it might take some time on slower computers
-            self.dialog = cmdWaitWindow(self.util, cmd)
+            install_dirs['snap'] = str(self.dialog.dirPathText.toPlainText())
+            site_packages_dir = os.path.join(
+                install_dirs['osgeo4w'], 'apps', 'Python27', 'Lib', 'site-packages')
+            # configure snappy
+            confbat = os.path.join(install_dirs['snap'], 'bin', 'snappy-conf.bat')
+            osgeopython = os.path.join(install_dirs['osgeo4w'], 'bin', 'python.exe')
+            cmd = [confbat, osgeopython, site_packages_dir]
+            self.dialog = cmdWaitWindow(self.util, cmd, notify=True)
             self.showDialog()
-            dstPath = os.path.join(os.path.expanduser("~"), ".snap")
-            srcPath = "SNAP additional modules"
-            self.util.copyFiles(srcPath, dstPath)
+
+            snappy_ini = os.path.join(site_packages_dir, 'snappy.ini')
+            with open(snappy_ini, 'w') as f:
+                f.write(
+                    '[DEFAULT]\n'
+                    'snap_home: {}\n'
+                    .format(install_dirs['snap']))
+
+            jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
+            replace = {
+                'java_home': '"{}"'.format(os.path.join(install_dirs['snap'], 'jre')),
+                'jvm_dll': 'None'}
+            installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
 
             # 32 bit systems usually have less RAM so assign less to S1 Toolbox
             ram_fraction = 0.4 if is32bit else 0.6
-            settingsfile = os.path.join(dirPath, 'bin', 'gpt.vmoptions')
-            installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)
+            settingsfile = os.path.join(install_dirs['snap'], 'bin', 'gpt.vmoptions')
+            try:
+                installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)
+            except IOError as exc:
+                self.util.error_exit(str(exc))
             # There is a bug in snap installer so the gpt file has to be
             # modified for 32 bit installation
             if is32bit:
-                self.util.removeIncompatibleJavaOptions(settingsfile)
-            self.util.activateSNAPplugin(dirPath)
+                try:
+                    installer_utils.removeIncompatibleJavaOptions(settingsfile)
+                except IOError as exc:
+                    self.error_exit(str(exc))
+            self.util.activateSNAPplugin(install_dirs['snap'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -295,7 +323,7 @@ class Installer():
         # run the R installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(rInstall)
-            # self.dialog = rPostInstallWindow(rDefaultDir)
+            # self.dialog = rPostInstallWindow(install_dirs['r'])
             # res = self.showDialog()
         elif res == SKIP:
             pass
@@ -306,12 +334,12 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = rPostInstallWindow(rDefaultDir)
+        self.dialog = rPostInstallWindow(install_dirs['r'])
         res = self.showDialog()
 
         # Copy the R additional libraries
         if res == NEXT:
-            dirPath = str(self.dialog.dirPathText.toPlainText())
+            dirPath = install_dirs['r'] = str(self.dialog.dirPathText.toPlainText())
             dstPath = os.path.join(dirPath, "library")
             srcPath = "R additional libraries"
             # show dialog because it might take some time on slower computers
@@ -390,6 +418,24 @@ class Utilities(QtCore.QObject):
         QtCore.QObject.__init__(self)
         # QGIS and processing settings
         self.qsettings = QtCore.QSettings("QGIS", "QGIS2")
+        self.logfile = tempfile.NamedTemporaryFile(
+            prefix='gwa_installer_utils_', suffix='.log', delete=False)
+
+    def _log_traceback(self, exc, notify=False, fail=False):
+        try:
+            self.logfile.write('\n{}'.format(exc.output))
+        except AttributeError:
+            pass
+        trace = traceback.format_exc()
+        self.logfile.write('\n{}'.format(trace))
+        if fail:
+            raise
+        elif notify:
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText(
+                "An error occurred: {}. Log written to \'{}\'."
+                .format(trace, self.logfile.name))
+            msgBox.exec_()
 
     def execSubprocess(self, command):
         # command should be a path to an exe file so check if it exists
@@ -412,37 +458,22 @@ class Utilities(QtCore.QObject):
         for line in iter(proc.readline, ""):
             pass
 
-    def execute_cmd(self, cmd):
+    def execute_cmd(self, cmd, shell=False, notify=False):
         """Execute cmd and save output to log file"""
-        with tempfile.NamedTemporaryFile(
-                prefix='gwa_installer_', suffix='.log', delete=False) as f:
-            output = ''
-            try:
-                si = subprocess.STARTUPINFO()
-                si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                output = subprocess.check_output(
-                    cmd,
-                    stdin=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    startupinfo=si)
-            except:
-                trace = traceback.format_exc()
-                msgBox = QtGui.QMessageBox()
-                msgBox.setText(
-                    "An error occurred: {}. Log written to \'{}\'."
-                    .format(trace, f.name))
-                msgBox.exec_()
-                f.write(trace)
-
-            if output:
-                f.write(output)
-                # debugging only
-                if False:
-                    msgBox = QtGui.QMessageBox()
-                    msgBox.setText("Output was\n{}".format(output))
-                    msgBox.exec_()
-
-        self.finished.emit()
+        self.logfile.write('\nExecuting command: {}\n'.format(cmd))
+        try:
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            subprocess.check_output(
+                cmd,
+                stdin=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                startupinfo=si,
+                shell=shell)
+        except subprocess.CalledProcessError as exc:
+            self._log_traceback(exc, notify=notify)
+        finally:
+            self.finished.emit()
 
     def install_msi(self, msipath):
         logfname = os.path.splitext(os.path.basename(msipath))[0] + '_gwa_install.log'
@@ -450,17 +481,34 @@ class Utilities(QtCore.QObject):
         cmd = 'msiexec /passive /norestart /i {msipath} /log {logpath}'.format(msipath, logpath)
         self.execute_cmd(cmd)
 
+    def install_pip_offline(self, osgeo_root, package_dir):
+        requirements_file = os.path.join(package_dir, 'requirements.txt')
+        if not os.path.isfile(requirements_file):
+            raise self.error_exit('No requirements file found in {}'.format(requirements_file))
+        osgeo_envbat = os.path.join(osgeo_root, 'bin', 'o4w_env.bat')
+        if not os.path.isfile(osgeo_envbat):
+            raise self.error_exit('No OSGeo env bat file found in {}'.format(osgeo_envbat))
+        cmd = (
+            'call {osgeo_envbat} && '
+            'python -m pip install --no-index --find-links "{package_dir}" '
+            '-r "{requirements_file}"'
+            .format(
+                osgeo_envbat=osgeo_envbat,
+                package_dir=package_dir,
+                requirements_file=requirements_file))
+        self.execute_cmd(cmd, shell=True, notify=True)
+
     def deleteFile(self, filePath):
         try:
             os.remove(filePath)
-        except:
-            pass
+        except OSError as exc:
+            self._log_traceback(exc, notify=False)
 
     def deleteDir(self, dirPath):
         try:
             shutil.rmtree(dirPath, ignore_errors=True)
-        except:
-            pass
+        except OSError as exc:
+            self._log_traceback(exc, notify=False)
 
     def error_exit(self, msg):
         msgBox = QtGui.QMessageBox()
@@ -540,32 +588,6 @@ class Utilities(QtCore.QObject):
                 pass
             return True
 
-    def removeIncompatibleJavaOptions(self, batFilePath):
-        # Make sure the snap batch file exists in the given directory
-        if not os.path.isfile(batFilePath):
-            msgBox = QtGui.QMessageBox()
-            msgBox.setText(
-                "Could not find the batch file!\n\n Could not modify Java VM options.")
-            msgBox.exec_()
-            return
-
-        # In the batch file remove the "-XX:+UseLoopPredicate"
-        # option which doesn't work with 32 bit installation.
-        # First do this in a temp file and then copy the temp file to the correct dir
-        tempFile = NamedTemporaryFile(delete=False)
-        tempFilePath = tempFile.name
-        tempFile.close()
-        with open(tempFilePath, 'w') as outfile, open(batFilePath, 'r') as infile:
-            for line in infile:
-                line = re.sub(r"-XX:\+UseLoopPredicate ", "", line)
-                outfile.write(line)
-        tempDir = os.path.dirname(tempFilePath)
-        tempgpt = os.path.join(tempDir, "gpt.bat")
-        if os.path.isfile(tempgpt):
-            os.remove(tempgpt)
-        os.rename(tempFilePath, tempgpt)
-        shutil.copy(tempgpt, batFilePath)
-
     def setQGISSettings(self, name, value):
         self.qsettings.setValue(name, value)
 
@@ -586,7 +608,7 @@ class Utilities(QtCore.QObject):
                 "PythonPlugins/valuetool",
                 "plugins/zonalstatisticsplugin")
 
-    def activateProcessingProviders(self, osgeo4wDefaultDir):
+    def activateProcessingProviders(self, osgeodir):
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS70", "true")
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS", "true")
         self.activateThis(
@@ -608,7 +630,7 @@ class Utilities(QtCore.QObject):
         self.setQGISSettings("Processing/configuration/TASKBAR_BUTTON_WORKFLOW", "false")
         # GRASS_FOLDER depends on GRASS version and must be set explicitly here
         try:
-            grass_root = os.path.join(osgeo4wDefaultDir, 'apps', 'grass')
+            grass_root = os.path.join(osgeodir, 'apps', 'grass')
             grass_folders = sorted([
                 d for d in glob.glob(os.path.join(grass_root, 'grass-*'))
                 if os.path.isdir(d)])
