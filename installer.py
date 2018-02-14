@@ -73,8 +73,8 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win32_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
-                postgreInstall = _joinbindir("postgresql-9.3.6-2-windows.exe")
-                postgisInstall = _joinbindir("postgis-bundle-pg93x32-setup-2.1.5-1.exe")
+                postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
+                postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -83,8 +83,8 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win64_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
-                postgreInstall = _joinbindir("postgresql-9.3.6-2-windows-x64.exe")
-                postgisInstall = _joinbindir("postgis-bundle-pg93x64-setup-2.1.5-2.exe")
+                postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
+                postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
             else:
                 self.util.error_exit(
                     'Neither 32 bit nor 64 bit instalations directory exists. '
