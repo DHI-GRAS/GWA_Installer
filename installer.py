@@ -600,6 +600,7 @@ class Utilities(QtCore.QObject):
         self.activateThis(
                 "PythonPlugins/atmospheric_correction",
                 "PythonPlugins/processing_workflow",
+                "PythonPlugins/processing_SWAT",
                 "PythonPlugins/openlayers_plugin",
                 "PythonPlugins/photo2shape",
                 "PythonPlugins/pointsamplingtool",
@@ -621,6 +622,7 @@ class Utilities(QtCore.QObject):
                 "Processing/configuration/ACTIVATE_WORKFLOW",
                 "Processing/configuration/ACTIVATE_GWA_TBX",
                 "Processing/configuration/ACTIVATE_WOIS_TOOLBOX",
+                "Processing/configuration/ACTIVATE_WG9HM",
                 "Processing/configuration/GRASS_LOG_COMMANDS",
                 "Processing/configuration/GRASS_LOG_CONSOLE",
                 "Processing/configuration/SAGA_LOG_COMMANDS",
