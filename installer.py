@@ -1,31 +1,7 @@
-"""
-***************************************************************************
-   installer.py
--------------------------------------
-    Copyright (C) 2016 globWetland Africa (www.globwetland-africa.org)
-
-***************************************************************************
-* The GlobWetland Africa toolbox has been developed as part of the Glob-  *
-* Wetland Africa project funded by the European Space Agency (ESA) in     *
-* partnership with the Africa Team of the Ramsar Convention on Wetlands.  *
-*                                                                         *
-* The Toolbox is a free software i.e. you can redistribute it and/or      *
-* modify it under the terms of the GNU General Public License as publis-  *
-* hed by the Free Software Foundation, either version 3 of the License,   *
-* or (at your option) any later version.                                  *
-*                                                                         *
-* The Toolbox is distributed in the hope that it will be useful, but      *
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTA-   *
-* BILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public *
-* License for more details.                                               *
-*                                                                         *
-* You should have received a copy of the GNU General Public License along *
-* with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-***************************************************************************
-"""
 import os
 import sys
 import glob
+import time
 import errno
 import shutil
 import functools
@@ -42,6 +18,8 @@ from installerGUI import beamInstallWindow, beamPostInstallWindow
 from installerGUI import snapInstallWindow, snapPostInstallWindow
 from installerGUI import rInstallWindow, rPostInstallWindow
 from installerGUI import postgreInstallWindow, postgisInstallWindow
+from installerGUI import mapwindowInstallWindow
+from installerGUI import mwswatInstallWindow, mwswatPostInstallWindow, swateditorInstallWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow
 from installerGUI import cmdWaitWindow
 from installerGUI import uninstallInstructionsWindow
@@ -75,6 +53,9 @@ class Installer():
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
+                mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
+                mwswatInstall = _joinbindir("MWSWAT2009.exe")
+                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -85,6 +66,9 @@ class Installer():
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
+                mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
+                mwswatInstall = _joinbindir("MWSWAT2009.exe")
+                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             else:
                 self.util.error_exit(
                     'Neither 32 bit nor 64 bit instalations directory exists. '
@@ -96,13 +80,16 @@ class Installer():
                     'osgeo4w': "C:\\OSGeo4W",
                     'snap': "C:\\Program Files\\snap",
                     'beam': "C:\\Program Files\\beam-5.0",
-                    'r': "C:\\Program Files\\R\\R-3.3.2"}
+                    'r': "C:\\Program Files\\R\\R-3.3.2",
+                    'mapwindow': "C:\\Program Files\\MapWindow",
+                }
             else:
                 install_dirs = {
                     'osgeo4w': "C:\\OSGeo4W64",
                     'snap': "C:\\Program Files\\snap",
                     'beam': "C:\\Program Files\\beam-5.0",
-                    'r': "C:\\Program Files\\R\\R-3.3.2"}
+                    'r': "C:\\Program Files\\R\\R-3.3.2",
+                    'mapwindow': "C:\\Program Files (x86)\\MapWindow"}
 
         elif res == CANCEL:
             del self.dialog
@@ -383,6 +370,101 @@ class Installer():
             res = self.showDialog()
             if res == NEXT:
                 self.util.execSubprocess(postgisInstall)
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+
+        ########################################################################
+        # Install MapWindow, SWAT and PEST
+        mapwindow_installed = False
+        mswat_installed = False
+        swateditor_installed = False
+
+        # install MapWindow
+        self.dialog = mapwindowInstallWindow()
+        res = self.showDialog()
+        if res == NEXT:
+            self.util.execSubprocess(mapwindowInstall)
+            mapwindow_installed = True
+        elif res == SKIP:
+            pass
+        elif res == CANCEL:
+            del self.dialog
+            return
+        else:
+            self.unknownActionPopup()
+
+        if mapwindow_installed:
+            # install MS SWAT
+            self.dialog = mwswatInstallWindow()
+            res = self.showDialog()
+            if res == NEXT:
+                self.util.execSubprocess(mwswatInstall)
+                mswat_installed = True
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+
+        if mswat_installed:
+            # install SWAT editor
+            self.dialog = swateditorInstallWindow()
+            res = self.showDialog()
+            if res == NEXT:
+                self.util.execSubprocess(swateditorInstall)
+                time.sleep(5)
+                swateditor_installed = True
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+
+        if swateditor_installed:
+            # install SWAT post-installation stuff
+            self.dialog = mwswatPostInstallWindow(install_dirs['mapwindow'])
+            res = self.showDialog()
+            if res == NEXT:
+                # copy the DTU customised MWSWAT 2009 installation
+                install_dirs['mapwindow'] = dirPath = str(self.dialog.dirPathText.toPlainText())
+                mwswatPath = os.path.join(dirPath, "Plugins", "MWSWAT2009")
+                dstPath = os.path.join(mwswatPath, 'swat2009DtuEnvVers0.2')
+                srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
+                self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
+                self.showDialog()
+
+                # copy and rename the customised MWSWAT exe
+                oldexe = os.path.join(mwswatPath, "swat2009rev481.exe_old")
+                revexe = os.path.join(mwswatPath, "swat2009rev481.exe")
+                newexe = os.path.join(dstPath, "swat2009DtuEnv.exe")
+
+                if os.path.isfile(oldexe):
+                    os.remove(oldexe)
+                os.rename(revexe, oldexe)
+
+                self.util.copyFiles(newexe, mwswatPath)
+                if os.path.isfile(revexe):
+                    os.remove(revexe)
+                os.rename(newexe, revexe)
+
+                # copy the modified database file
+                self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
+                # copy PEST
+                self.dialog = copyingWaitWindow(
+                    self.util, "MWSWAT additional software\\PEST",
+                    os.path.join(mwswatPath, "PEST"))
+                self.showDialog()
+                # activate the plugin
+                self.util.activateSWATplugin(dirPath)
             elif res == SKIP:
                 pass
             elif res == CANCEL:
