@@ -222,6 +222,7 @@ class snapPostInstallWindow(postInstallWindow):
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
 
+
 # R
 class rInstallWindow(installWindow):
     def __init__(self):
@@ -233,6 +234,7 @@ class rInstallWindow(installWindow):
         self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by GWA Toolbox for various data processing tasks.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. In the installer you will be asked to accept the R license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
+
 
 class rPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -247,6 +249,7 @@ class rPostInstallWindow(postInstallWindow):
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
 
+
 # PostGre
 class postgreInstallWindow(installWindow):
     def __init__(self):
@@ -259,6 +262,7 @@ class postgreInstallWindow(installWindow):
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer will start. We recommend that you keep all the default options and use <b>\"postgres\"</b> for both username and password (and remember this choice). In the last step make sure that the option to launch Stack Builder is <b>NOT</b> selected.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
+
 # PostGIS
 class postgisInstallWindow(installWindow):
     def __init__(self):
@@ -270,6 +274,59 @@ class postgisInstallWindow(installWindow):
         self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by GWA Toolbox for storing certain types of data. It is not necessary to have it installed on every computer using GWA Toolbox, since the database can run from a central server. Therefore its installation is optional.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostGIS installer will start. You need to accept the license and then when choosing components to install select 'PostGIS' <b>but not 'Create spatial database'</b>. If any questions pop up just click Yes.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
+
+
+# MapWindow
+class mapwindowInstallWindow(installWindow):
+    def __init__(self):
+        installWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/swatLogo.png")))
+
+    def retranslateUi(self, MainWindow):
+        super(mapwindowInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the MapWindow installer will start. MapWindow is used as front end for setting up new SWAT models. During the installation keep all the default options", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
+
+
+# MWSWAT
+class mwswatInstallWindow(installWindow):
+    def __init__(self):
+        installWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/swatLogo.png")))
+
+    def retranslateUi(self, MainWindow):
+        super(mwswatInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the MWSWAT 2009 installer will start. MWSWAT is the SWAT implementation used by GWA Toolbox. During the installation keep all the default options", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
+
+
+class mwswatPostInstallWindow(postInstallWindow):
+    def __init__(self, defaultPath):
+        self.defaultPath = defaultPath
+        postInstallWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/mwswatLogo.png")))
+
+    def retranslateUi(self, MainWindow):
+        super(mwswatPostInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for SWAT. If you changed the MapWindow installation directory during the previous steps, make sure that you update the path to the directory below.", None))
+        self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
+
+
+# MWSWAT editor
+class swateditorInstallWindow(installWindow):
+    def __init__(self):
+        installWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/swatLogo.png")))
+
+    def retranslateUi(self, MainWindow):
+        super(swateditorInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate("MainWindow", "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced component and not every user requires the hydrological modeling functionality. Therefore its installation is optional.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the SWAT editor installer will start. SWAT editor is used for setting up new SWAT models. During the installation keep all the default options", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 
 # Finish
