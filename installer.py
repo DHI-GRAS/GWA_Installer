@@ -69,8 +69,8 @@ def _set_logfile_handler():
 
 class Installer():
 
-    def __init__(self):
-        self.util = Utilities()
+    def __init__(self, logfile):
+        self.util = Utilities(logfile)
 
     def runInstaller(self):
         ########################################################################
@@ -183,7 +183,7 @@ class Installer():
             QGIS_extras_dir = os.path.abspath("QGIS additional software")
             processing_dir = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
             processing_packages = glob.glob(os.path.join(QGIS_extras_dir, '*.zip'))
-            self.util.logger.info('Found processing packages: %s', processing_packages)
+            logger.info('Found processing packages: %s', processing_packages)
             for zipfname in processing_packages:
                 # show dialog because it might take some time on slower computers
                 self.dialog = extractingWaitWindow(self.util, zipfname, processing_dir)
@@ -193,7 +193,7 @@ class Installer():
             site_packages_dir = os.path.join(
                 install_dirs['osgeo4w'], 'apps', 'Python27', 'Lib', 'site-packages')
             python_packages = glob.glob(os.path.join(QGIS_extras_dir, 'python_packages', '*.zip'))
-            self.util.logger.info('Found python packages: %s', python_packages)
+            logger.info('Found python packages: %s', python_packages)
             for zipfname in python_packages:
                 self.dialog = extractingWaitWindow(self.util, zipfname, site_packages_dir)
                 self.showDialog()
@@ -429,13 +429,13 @@ class Installer():
 class Utilities(QtCore.QObject):
     finished = QtCore.pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, logfile):
 
         QtCore.QObject.__init__(self)
         # QGIS and processing settings
         self.qsettings = QtCore.QSettings("QGIS", "QGIS2")
         # logging
-        self.logfile = _set_logfile_handler()
+        self.logfile = logfile
 
     def _log_traceback(self, notify=False, fail=False):
         logger.exception('Something went wrong.')
@@ -477,12 +477,13 @@ class Utilities(QtCore.QObject):
         try:
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            subprocess.check_output(
+            output = subprocess.check_output(
                 cmd,
                 stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 startupinfo=si,
                 shell=shell)
+            logger.info(output)
         except subprocess.CalledProcessError:
             self._log_traceback(notify=notify)
         finally:
@@ -587,29 +588,31 @@ class Utilities(QtCore.QObject):
                 .format(archivePath, dstPath))
             return
 
-        archive = ZipFile(archivePath)
-        archive.extractall(dstPath)
-        archive.close()
+        with ZipFile(archivePath) as archive:
+            archive.extractall(dstPath)
         self.finished.emit()
 
     def checkWritePermissions(self, dstPath):
-        logger.info('Checking write permissions on %s', dstPath)
+        logger.debug('Checking write permissions on %s', dstPath)
+        testfile = os.path.join(dstPath, "_test")
         try:
             if not os.path.isdir(dstPath):
+                logger.debug('Creating directory in %s', dstPath)
                 os.makedirs(dstPath)
-            fp = open(os.path.join(dstPath, "test"), 'w')
+            with open(testfile, 'w'):
+                pass
         except IOError as e:
+            logger.debug('%s', e)
             if e.errno == errno.EACCES:
                 return False
             else:
                 return False
         else:
-            fp.close()
             try:
-                os.remove(os.path.join(dstPath, "test"))
+                os.remove(testfile)
             except:
                 pass
-            return True
+        return True
 
     def setQGISSettings(self, name, value):
         logger.info('Set %s to %s', name, value)
@@ -689,14 +692,20 @@ class Utilities(QtCore.QObject):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    logfile = _set_logfile_handler()
 
-    installer = Installer()
+    try:
+        app = QtGui.QApplication(sys.argv)
 
-    # Fix to make sure that runInstaller is executed in the app event loop
-    def _slot_installer():
-        QtCore.SLOT(installer.runInstaller())
+        installer = Installer(logfile=logfile)
 
-    QtCore.QTimer.singleShot(200, _slot_installer)
+        # Fix to make sure that runInstaller is executed in the app event loop
+        def _slot_installer():
+            QtCore.SLOT(installer.runInstaller())
 
-    app.exec_()
+        QtCore.QTimer.singleShot(200, _slot_installer)
+
+        app.exec_()
+    except:
+        logger.exception()
+        raise
