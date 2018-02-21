@@ -161,7 +161,7 @@ class Installer():
 
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
-            srcPath = os.path.join("QGIS additional software", "plugins.zip")
+            srcPath = os.path.join("QGIS additional software", "plugins", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
                 'mikecprovider',
