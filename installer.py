@@ -771,6 +771,12 @@ class Utilities(QtCore.QObject):
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
 
+    def activateSWATplugin(self, dirPath):
+        self.activateThis(
+                "PythonPlugins/processing_SWAT",
+                "Processing/configuration/ACTIVATE_WG9HM")
+        self.setQGISSettings("Processing/configuration/MAPWINDOW_FOLDER", dirPath)
+
 
 if __name__ == '__main__':
 
