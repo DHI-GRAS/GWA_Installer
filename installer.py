@@ -52,6 +52,20 @@ from installerGUI import CANCEL, SKIP, NEXT
 
 import installer_utils
 
+logger = logging.getLogger('gwa_installer')
+
+
+def _set_logfile_handler():
+    datestr = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    logfile = os.path.join(tempfile.gettempdir(), 'gwa_install_{}.log'.format(datestr))
+    logger.setLevel('DEBUG')
+    fh = logging.FileHandler(logfile)
+    fh.setLevel('DEBUG')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+    return logfile
+
 
 class Installer():
 
@@ -421,23 +435,10 @@ class Utilities(QtCore.QObject):
         # QGIS and processing settings
         self.qsettings = QtCore.QSettings("QGIS", "QGIS2")
         # logging
-        self.logger, self.logfile = self.get_logger_and_file()
-
-    @staticmethod
-    def _get_logger():
-        logger = logging.getLogger(__name__)
-        datestr = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        logfile = os.path.join(tempfile.gettempdir(), 'gwa_install_{}.log'.format(datestr))
-        logger.setLevel('DEBUG')
-        fh = logging.FileHandler(logfile)
-        fh.setLevel('DEBUG')
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-        return logger, logfile
+        self.logfile = _set_logfile_handler()
 
     def _log_traceback(self, notify=False, fail=False):
-        self.logger.exception('Something went wrong.')
+        logger.exception('Something went wrong.')
         if fail:
             raise
         elif notify:
@@ -449,7 +450,7 @@ class Utilities(QtCore.QObject):
             msgBox.exec_()
 
     def execSubprocess(self, command):
-        self.logger.info('Running binary installer: %s', command)
+        logger.info('Running binary installer: %s', command)
         # command should be a path to an exe file so check if it exists
         if not os.path.isfile(command):
             msgBox = QtGui.QMessageBox()
@@ -472,7 +473,7 @@ class Utilities(QtCore.QObject):
 
     def execute_cmd(self, cmd, shell=False, notify=False):
         """Execute cmd and save output to log file"""
-        self.logger.info('Executing command: %s', cmd)
+        logger.info('Executing command: %s', cmd)
         try:
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -490,13 +491,15 @@ class Utilities(QtCore.QObject):
     def install_msi(self, msipath):
         logfname = os.path.splitext(os.path.basename(msipath))[0] + '_gwa_install.log'
         logpath = os.path.join(tempfile.gettempdir(), logfname)
+        logger.info('Installing MSI %s and logging to %s', msipath, logpath)
         cmd = 'msiexec /passive /norestart /i {msipath} /log {logpath}'.format(msipath, logpath)
         self.execute_cmd(cmd)
 
     def install_pip_offline(self, osgeo_root, package_dir):
         requirements_file = os.path.join(package_dir, 'requirements.txt')
+        logger.info('Installing with pip install -r %s', requirements_file)
         if not os.path.isfile(requirements_file):
-            raise self.error_exit('No requirements file found in {}'.format(requirements_file))
+            self.error_exit('No requirements file found in {}'.format(requirements_file))
         osgeo_envbat = os.path.join(osgeo_root, 'bin', 'o4w_env.bat')
         if not os.path.isfile(osgeo_envbat):
             raise self.error_exit('No OSGeo env bat file found in {}'.format(osgeo_envbat))
@@ -511,26 +514,28 @@ class Utilities(QtCore.QObject):
         self.execute_cmd(cmd, shell=True, notify=True)
 
     def deleteFile(self, filePath):
+        logger.info('Deleting file %s', filePath)
         try:
             os.remove(filePath)
         except OSError:
             self._log_traceback(notify=False)
 
     def deleteDir(self, dirPath):
+        logger.info('Deleting dir %s', dirPath)
         try:
             shutil.rmtree(dirPath, ignore_errors=True)
         except OSError:
             self._log_traceback(notify=False)
 
     def error_exit(self, msg):
-        self.logger.error(msg)
+        logger.error(msg)
         msgBox = QtGui.QMessageBox()
         msgBox.setText(msg)
         msgBox.exec_()
         self.finished.emit()
 
     def copyFiles(self, srcPath, dstPath, checkDstParentExists=True):
-        self.logger.info('Copying files from %s to %s', srcPath, dstPath)
+        logger.info('Copying files from %s to %s', srcPath, dstPath)
 
         # a simple check to see if we are copying to the right directory by making sure that
         # its parent exists
@@ -559,7 +564,7 @@ class Utilities(QtCore.QObject):
             shutil.copy(srcPath, dstPath)
         else:
             msg = "Cannot find the source directory!\n\n No files were copied."
-            self.logger.error(msg)
+            logger.error(msg)
             msgBox = QtGui.QMessageBox()
             msgBox.setText(msg)
             msgBox.exec_()
@@ -567,7 +572,7 @@ class Utilities(QtCore.QObject):
         self.finished.emit()
 
     def unzipArchive(self, archivePath, dstPath):
-        self.logger.info('Unzipping %s to %s', archivePath, dstPath)
+        logger.info('Unzipping %s to %s', archivePath, dstPath)
         if not os.path.isfile(archivePath):
             self.error_exit("Could not find the archive!\n\n No files were extracted.")
             return
@@ -588,6 +593,7 @@ class Utilities(QtCore.QObject):
         self.finished.emit()
 
     def checkWritePermissions(self, dstPath):
+        logger.info('Checking write permissions on %s', dstPath)
         try:
             if not os.path.isdir(dstPath):
                 os.makedirs(dstPath)
@@ -606,6 +612,7 @@ class Utilities(QtCore.QObject):
             return True
 
     def setQGISSettings(self, name, value):
+        logger.info('Set %s to %s', name, value)
         self.qsettings.setValue(name, value)
 
     def activateThis(self, *names):

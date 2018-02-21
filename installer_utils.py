@@ -5,8 +5,11 @@ import shutil
 import tempfile
 import ctypes
 import ctypes.wintypes
+import logging
 
 from PyQt4 import QtGui
+
+logger = logging.getLogger('gwa_installer')
 
 
 def _get_ram():
@@ -34,6 +37,7 @@ def _get_ram():
 
 
 def modifyRamInBatFiles(batFilePath, useRamFraction):
+    logger.info('Setting RAM fraction %s in bat file %s', useRamFraction, batFilePath)
     # Check how much RAM the system has. Only works in Windows
     if sys.platform != 'win32':
         msgBox = QtGui.QMessageBox()
@@ -43,7 +47,8 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
         msgBox.exec_()
         return
     totalRam = _get_ram()
-    totalRam = totalRam / (1024*1024)
+    totalRam = totalRam / (1024 * 1024)
+    logger.info('Determined total RAM %d', totalRam)
 
     # Make sure the BEAM/SNAP batch file exists in the given directory
     if not os.path.isfile(batFilePath):
@@ -73,6 +78,7 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
                     outfile.write(line)
         except:
             shutil.move(backupfile, batFilePath)
+            logger.exception()
             raise
 
     elif batFilePath.endswith('.vmoptions'):
@@ -81,6 +87,7 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
         # by SNAP to some % of system RAM, first in a temp file
         # and then copy the temp file to the correct dir
         ram_flag = "-Xmx"+str(int(totalRam*useRamFraction))+"m"
+        logger.info('RAM flag is %s', ram_flag)
         backupfile = batFilePath + '.backup'
         try:
             os.remove(backupfile)
@@ -97,10 +104,12 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
                 outfile.write(ram_flag)
         except:
             shutil.move(backupfile, batFilePath)
+            logger.exception()
             raise
 
 
 def removeIncompatibleJavaOptions(self, batFilePath):
+    logger.info('Removing incompatible Java options from %s', batFilePath)
     # Make sure the snap batch file exists in the given directory
     if not os.path.isfile(batFilePath):
         raise IOError('batch file does not exist: {}'.format(batFilePath))
@@ -124,7 +133,9 @@ def removeIncompatibleJavaOptions(self, batFilePath):
 
 
 def fix_jpyconfig(path, replace):
+    logger.info('Fixing jpyconfig in %s with %s', path, replace)
     if not os.path.isfile(path):
+        logger.error('File not found %s', path)
         return
     path_backup = path + '.backup'
     shutil.move(path, path_backup)
@@ -133,6 +144,7 @@ def fix_jpyconfig(path, replace):
             for line in fin:
                 for key, value in replace.items():
                     if key in line:
+                        logger.info('Replacing %s with %s', key, value)
                         line = re.sub('\=.*', '= {}'.format(value), line.rstrip()) + '\n'
                         break
                 fout.write(line)
