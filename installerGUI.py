@@ -416,9 +416,10 @@ class extractingWaitWindow(instructionsWindow, QtCore.QObject):
     def retranslateUi(self, MainWindow):
         super(extractingWaitWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(
-            _translate("MainWindow",
-                       "Extracting an archive ({}). Please wait...".format(os.path.splitext(os.path.basename(self.archivePath))[0]),
-                       None))
+            _translate(
+                "MainWindow",
+                "Extracting an archive ({}). Please wait...".format(os.path.splitext(os.path.basename(self.archivePath))[0]),
+                None))
         self.instructionsMainLabel.setVisible(False)
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)
