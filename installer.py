@@ -32,6 +32,8 @@ import functools
 import subprocess
 import traceback
 import tempfile
+import datetime
+import logging
 from zipfile import ZipFile
 from distutils import dir_util
 
@@ -165,19 +167,19 @@ class Installer():
 
             # copy scripts and models
             QGIS_extras_dir = os.path.abspath("QGIS additional software")
-            dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
-            for zipfname in [
-                    'WOIS_scripts.zip', 'WOIS_models_and_workflows.zip',
-                    'GWA_scripts.zip', 'GWA_models_and_workflows.zip']:
-                srcPath = os.path.join(QGIS_extras_dir, zipfname)
+            processing_dir = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
+            processing_packages = glob.glob(os.path.join(QGIS_extras_dir, '*.zip'))
+            self.util.logger.info('Found processing packages: %s', processing_packages)
+            for zipfname in processing_packages:
                 # show dialog because it might take some time on slower computers
-                self.dialog = extractingWaitWindow(self.util, srcPath, dstPath)
+                self.dialog = extractingWaitWindow(self.util, zipfname, processing_dir)
                 self.showDialog()
 
             # copy additional python packages
             site_packages_dir = os.path.join(
                 install_dirs['osgeo4w'], 'apps', 'Python27', 'Lib', 'site-packages')
             python_packages = glob.glob(os.path.join(QGIS_extras_dir, 'python_packages', '*.zip'))
+            self.util.logger.info('Found python packages: %s', python_packages)
             for zipfname in python_packages:
                 self.dialog = extractingWaitWindow(self.util, zipfname, site_packages_dir)
                 self.showDialog()
@@ -418,26 +420,36 @@ class Utilities(QtCore.QObject):
         QtCore.QObject.__init__(self)
         # QGIS and processing settings
         self.qsettings = QtCore.QSettings("QGIS", "QGIS2")
-        self.logfile = tempfile.NamedTemporaryFile(
-            prefix='gwa_installer_utils_', suffix='.log', delete=False)
+        # logging
+        self.logger, self.logfile = self.get_logger_and_file()
 
-    def _log_traceback(self, exc, notify=False, fail=False):
-        try:
-            self.logfile.write('\n{}'.format(exc.output))
-        except AttributeError:
-            pass
-        trace = traceback.format_exc()
-        self.logfile.write('\n{}'.format(trace))
+    @staticmethod
+    def _get_logger():
+        logger = logging.getLogger(__name__)
+        datestr = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        logfile = os.path.join(tempfile.gettempdir(), 'gwa_install_{}.log'.format(datestr))
+        logger.setLevel('DEBUG')
+        fh = logging.FileHandler(logfile)
+        fh.setLevel('DEBUG')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+        return logger, logfile
+
+    def _log_traceback(self, notify=False, fail=False):
+        self.logger.exception('Something went wrong.')
         if fail:
             raise
         elif notify:
+            trace = traceback.format_exc()
             msgBox = QtGui.QMessageBox()
             msgBox.setText(
                 "An error occurred: {}. Log written to \'{}\'."
-                .format(trace, self.logfile.name))
+                .format(trace, self.logfile))
             msgBox.exec_()
 
     def execSubprocess(self, command):
+        self.logger.info('Running binary installer: %s', command)
         # command should be a path to an exe file so check if it exists
         if not os.path.isfile(command):
             msgBox = QtGui.QMessageBox()
@@ -460,7 +472,7 @@ class Utilities(QtCore.QObject):
 
     def execute_cmd(self, cmd, shell=False, notify=False):
         """Execute cmd and save output to log file"""
-        self.logfile.write('\nExecuting command: {}\n'.format(cmd))
+        self.logger.info('Executing command: %s', cmd)
         try:
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -470,8 +482,8 @@ class Utilities(QtCore.QObject):
                 stderr=subprocess.PIPE,
                 startupinfo=si,
                 shell=shell)
-        except subprocess.CalledProcessError as exc:
-            self._log_traceback(exc, notify=notify)
+        except subprocess.CalledProcessError:
+            self._log_traceback(notify=notify)
         finally:
             self.finished.emit()
 
@@ -501,22 +513,24 @@ class Utilities(QtCore.QObject):
     def deleteFile(self, filePath):
         try:
             os.remove(filePath)
-        except OSError as exc:
-            self._log_traceback(exc, notify=False)
+        except OSError:
+            self._log_traceback(notify=False)
 
     def deleteDir(self, dirPath):
         try:
             shutil.rmtree(dirPath, ignore_errors=True)
-        except OSError as exc:
-            self._log_traceback(exc, notify=False)
+        except OSError:
+            self._log_traceback(notify=False)
 
     def error_exit(self, msg):
+        self.logger.error(msg)
         msgBox = QtGui.QMessageBox()
         msgBox.setText(msg)
         msgBox.exec_()
         self.finished.emit()
 
     def copyFiles(self, srcPath, dstPath, checkDstParentExists=True):
+        self.logger.info('Copying files from %s to %s', srcPath, dstPath)
 
         # a simple check to see if we are copying to the right directory by making sure that
         # its parent exists
@@ -544,13 +558,16 @@ class Utilities(QtCore.QObject):
         elif os.path.isfile(srcPath):
             shutil.copy(srcPath, dstPath)
         else:
+            msg = "Cannot find the source directory!\n\n No files were copied."
+            self.logger.error(msg)
             msgBox = QtGui.QMessageBox()
-            msgBox.setText("Cannot find the source directory!\n\n No files were copied.")
+            msgBox.setText(msg)
             msgBox.exec_()
 
         self.finished.emit()
 
     def unzipArchive(self, archivePath, dstPath):
+        self.logger.info('Unzipping %s to %s', archivePath, dstPath)
         if not os.path.isfile(archivePath):
             self.error_exit("Could not find the archive!\n\n No files were extracted.")
             return
