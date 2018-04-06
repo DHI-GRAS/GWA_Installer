@@ -494,7 +494,8 @@ class Utilities(QtCore.QObject):
         logpath = os.path.join(tempfile.gettempdir(), logfname)
         logger.info('Installing MSI %s and logging to %s', msipath, logpath)
         cmd = 'msiexec /passive /norestart /i {msipath} /log {logpath}'.format(msipath, logpath)
-        self.execute_cmd(cmd)
+        self.dialog = cmdWaitWindow(self.util, cmd, shell=True, notify=True)
+        self.showDialog()
 
     def install_pip_offline(self, osgeo_root, package_dir):
         requirements_file = os.path.join(package_dir, 'requirements.txt')
@@ -515,7 +516,9 @@ class Utilities(QtCore.QObject):
                 osgeo_envbat=osgeo_envbat,
                 package_dir=package_dir,
                 requirements_file=requirements_file))
-        self.execute_cmd(cmd, shell=True, notify=True)
+
+        self.dialog = cmdWaitWindow(self.util, cmd, shell=True, notify=True)
+        self.showDialog()
 
     def deleteFile(self, filePath):
         logger.info('Deleting file %s', filePath)
