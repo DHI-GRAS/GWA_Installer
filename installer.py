@@ -505,9 +505,12 @@ class Utilities(QtCore.QObject):
         if not os.path.isfile(osgeo_envbat):
             raise self.error_exit('No OSGeo env bat file found in {}'.format(osgeo_envbat))
         cmd = (
-            'call {osgeo_envbat} && '
+            'call {osgeo_envbat} & '
+            'if defined OSGEO4W_ROOT '
+            '('
             'python -m pip install --no-index --find-links "{package_dir}" '
             '-r "{requirements_file}"'
+            ')'
             .format(
                 osgeo_envbat=osgeo_envbat,
                 package_dir=package_dir,
