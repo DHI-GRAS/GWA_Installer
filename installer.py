@@ -187,9 +187,11 @@ class Installer():
 
             # install additional python packages with pip
             pip_package_dir = os.path.join(QGIS_extras_dir, 'python_packages_pip')
-            self.util.install_pip_offline(
+            cmd, cmdkw = self.util.cmd_install_pip_offline(
                 osgeo_root=install_dirs['osgeo4w'],
                 package_dir=pip_package_dir)
+            self.dialog = cmdWaitWindow(self.util, cmd, **cmdkw)
+            self.showDialog()
 
             # activate plugins and processing providers
             self.util.activatePlugins()
@@ -571,15 +573,15 @@ class Utilities(QtCore.QObject):
         finally:
             self.finished.emit()
 
-    def install_msi(self, msipath):
+    def cmd_install_msi(self, msipath):
         logfname = os.path.splitext(os.path.basename(msipath))[0] + '_gwa_install.log'
         logpath = os.path.join(tempfile.gettempdir(), logfname)
         logger.info('Installing MSI %s and logging to %s', msipath, logpath)
         cmd = 'msiexec /passive /norestart /i {msipath} /log {logpath}'.format(msipath, logpath)
-        self.dialog = cmdWaitWindow(self.util, cmd, shell=True, notify=True)
-        self.showDialog()
+        kwargs = dict(shell=True, notify=True)
+        return cmd, kwargs
 
-    def install_pip_offline(self, osgeo_root, package_dir):
+    def cmd_install_pip_offline(self, osgeo_root, package_dir):
         requirements_file = os.path.join(package_dir, 'requirements.txt')
         logger.info('Installing with pip install -r %s', requirements_file)
         if not os.path.isfile(requirements_file):
@@ -598,9 +600,8 @@ class Utilities(QtCore.QObject):
                 osgeo_envbat=osgeo_envbat,
                 package_dir=package_dir,
                 requirements_file=requirements_file))
-
-        self.dialog = cmdWaitWindow(self.util, cmd, shell=True, notify=True)
-        self.showDialog()
+        kwargs = dict(shell=True, notify=True)
+        return cmd, kwargs
 
     def deleteFile(self, filePath):
         logger.info('Deleting file %s', filePath)
