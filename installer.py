@@ -19,6 +19,7 @@ from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow
 from installerGUI import beamInstallWindow, beamPostInstallWindow
 from installerGUI import snapInstallWindow, snapPostInstallWindow
 from installerGUI import rInstallWindow, rPostInstallWindow
+from installerGUI import taudemInstallWindow
 from installerGUI import postgreInstallWindow, postgisInstallWindow
 from installerGUI import mapwindowInstallWindow
 from installerGUI import mwswatInstallWindow, mwswatPostInstallWindow, swateditorInstallWindow
