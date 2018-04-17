@@ -89,6 +89,7 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win32_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
+                taudemInstall = None
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
             elif os.path.isdir(installationsDirs[1]):
@@ -99,6 +100,7 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win64_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
+                taudemInstall = _joinbindir("TauDEM537_setup.exe")
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
             else:
@@ -368,6 +370,21 @@ class Installer():
                 self.util.activateRplugin(dirPath, "false")
             else:
                 self.util.activateRplugin(dirPath, "true")
+        elif res == SKIP:
+            pass
+        elif res == CANCEL:
+            del self.dialog
+            return
+        else:
+            self.unknownActionPopup()
+
+        ########################################################################
+        # Install TauDEM
+
+        self.dialog = taudemInstallWindow()
+        res = self.showDialog()
+        if res == NEXT:
+            self.util.execSubprocess(taudemInstall)
         elif res == SKIP:
             pass
         elif res == CANCEL:
