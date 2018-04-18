@@ -260,7 +260,7 @@ class taudemInstallWindow(installWindow):
         self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/taudem_logo.png")))
 
     def retranslateUi(self, MainWindow):
-        super(rInstallWindow, self).retranslateUi(MainWindow)
+        super(taudemInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "TauDEM (Terrain Analysis Using Digital Elevation Models) is used to extract and analyse hydrologic information from topography.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the TauDEM installer will start. You can keep all the defaults.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install TauDEM", None))
