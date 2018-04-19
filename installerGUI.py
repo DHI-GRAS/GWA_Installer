@@ -26,7 +26,8 @@
 import os
 
 from PyQt4 import QtCore, QtGui
-from ui import welcomeDialog, installComponentDialog, postInstallComponentDialog, componentInstructionsDialog
+from ui import welcomeDialog, installComponentDialog
+from ui import postInstallComponentDialog, componentInstructionsDialog
 
 # MACROS
 try:
@@ -50,14 +51,14 @@ NEXT = QtGui.QDialog.Accepted
 SKIP = QtGui.QDialog.Accepted + 1
 
 
-
-##################################################################################
+# #################################################################################
 # Parent classes
 # Used to avoid overwriting the files produced by QtDesigner and pyuic4
 # Mostly assign actions to buttons and set up the dialog
 
+
 class installerBaseWindow():
-    def __init__(self, MainWindow = None):
+    def __init__(self, MainWindow=None):
         if MainWindow:
             self.MainWindow = MainWindow
         else:
@@ -78,6 +79,7 @@ class installerBaseWindow():
     def skip(self):
         self.MainWindow.done(SKIP)
 
+
 class installerWelcomeWindow(installerBaseWindow, welcomeDialog.Ui_Dialog):
 
     def __init__(self):
@@ -87,6 +89,7 @@ class installerWelcomeWindow(installerBaseWindow, welcomeDialog.Ui_Dialog):
 
         QtCore.QObject.connect(self.beginButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
+
 
 class installWindow(installerBaseWindow, installComponentDialog.Ui_Dialog):
     def __init__(self):
@@ -115,11 +118,12 @@ class postInstallWindow(installerBaseWindow, postInstallComponentDialog.Ui_Dialo
         if not path.isNull():
             self.dirPathText.setPlainText(_translate("MainWindow", path, None))
 
+
 class instructionsWindow(installerBaseWindow, componentInstructionsDialog.Ui_Dialog):
 
     # This window can have a reimplemented QDialog used as the main window to allow
     # for multithreaded operations while the window is displayed
-    def __init__(self, MainWindow = None):
+    def __init__(self, MainWindow=None):
 
         installerBaseWindow.__init__(self, MainWindow)
         self.setupUi(self.MainWindow)
@@ -129,7 +133,7 @@ class instructionsWindow(installerBaseWindow, componentInstructionsDialog.Ui_Dia
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
 
 
-###############################################################################
+# ##############################################################################
 # Child classes
 # Individualise the parent classes mostly by changing the text
 
@@ -146,7 +150,6 @@ class uninstallInstructionsWindow(instructionsWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Uninstall old version", None))
 
 
-# OSGeo4W
 class osgeo4wInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -157,6 +160,7 @@ class osgeo4wInstallWindow(installWindow):
         self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by GWA Toolbox while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. The process should be automatic but if any question dialogs pop-up just click OK.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
+
 
 class osgeo4wPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -172,7 +176,6 @@ class osgeo4wPostInstallWindow(postInstallWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
 
 
-# BEAM
 class beamInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -183,6 +186,7 @@ class beamInstallWindow(installWindow):
         self.topLabel.setText(_translate("MainWindow", "BEAM is a software for analyzing optical and thermal data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the BEAM installer will start. In the installer you will be asked to accept the BEAM license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install BEAM", None))
+
 
 class beamPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -197,7 +201,7 @@ class beamPostInstallWindow(postInstallWindow):
         self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install BEAM", None))
 
-# SNAP
+
 class snapInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -208,6 +212,7 @@ class snapInstallWindow(installWindow):
         self.topLabel.setText(_translate("MainWindow", "Snap Toolbox is a software for analyzing data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
         self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the Snap Toolbox installer will start. In the installer you will be asked to accept the Snap Toolbox license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
+
 
 class snapPostInstallWindow(postInstallWindow):
     def __init__(self, defaultPath):
@@ -223,7 +228,6 @@ class snapPostInstallWindow(postInstallWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
 
 
-# R
 class rInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -232,7 +236,7 @@ class rInstallWindow(installWindow):
     def retranslateUi(self, MainWindow):
         super(rInstallWindow, self).retranslateUi(MainWindow)
         self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by GWA Toolbox for various data processing tasks.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. In the installer you will be asked to accept the R license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the R installer will start. In the installer you will be asked to accept the R license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
 
 
@@ -250,7 +254,18 @@ class rPostInstallWindow(postInstallWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
 
 
-# PostGre
+class taudemInstallWindow(installWindow):
+    def __init__(self):
+        installWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/taudem_logo.png")))
+
+    def retranslateUi(self, MainWindow):
+        super(taudemInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate("MainWindow", "TauDEM (Terrain Analysis Using Digital Elevation Models) is used to extract and analyse hydrologic information from topography.", None))
+        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the TauDEM installer will start. You can keep all the defaults.", None))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install TauDEM", None))
+
+
 class postgreInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -263,7 +278,6 @@ class postgreInstallWindow(installWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
 
-# PostGIS
 class postgisInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -276,7 +290,6 @@ class postgisInstallWindow(installWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
 
 
-# MapWindow
 class mapwindowInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -289,7 +302,6 @@ class mapwindowInstallWindow(installWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 
-# MWSWAT
 class mwswatInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -316,7 +328,6 @@ class mwswatPostInstallWindow(postInstallWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 
-# MWSWAT editor
 class swateditorInstallWindow(installWindow):
     def __init__(self):
         installWindow.__init__(self)
@@ -329,7 +340,6 @@ class swateditorInstallWindow(installWindow):
         self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - SWAT hydrological model (Optional)", None))
 
 
-# Finish
 class finishWindow(instructionsWindow):
     def __init__(self):
         instructionsWindow.__init__(self)
@@ -350,7 +360,6 @@ class finishWindow(instructionsWindow):
         self.cancelButton.setText(_translate("MainWindow", "Finish", None))
 
 
-# cmd please wait
 class cmdWaitWindow(instructionsWindow, QtCore.QObject):
 
     def __init__(self, utilities, cmd, **kwargs):
@@ -392,7 +401,6 @@ class cmdWaitWindow(instructionsWindow, QtCore.QObject):
         self.MainWindow.close()
 
 
-# Extracting please wait
 class extractingWaitWindow(instructionsWindow, QtCore.QObject):
 
     def __init__(self, utilities, archivePath, dstPath):
@@ -435,9 +443,9 @@ class extractingWaitWindow(instructionsWindow, QtCore.QObject):
         self.action = NEXT
         self.MainWindow.close()
 
-# Copying please wait
+
 class copyingWaitWindow(instructionsWindow, QtCore.QObject):
-    def __init__(self, utilities, srcPath, dstPath, checkDstParentExists = False):
+    def __init__(self, utilities, srcPath, dstPath, checkDstParentExists=False):
         QtCore.QObject.__init__(self)
 
         self.utilities = utilities
@@ -474,21 +482,22 @@ class copyingWaitWindow(instructionsWindow, QtCore.QObject):
         self.action = NEXT
         self.MainWindow.close()
 
-# Reimplement QDialog to start a given thread shortly after the dialog is displayed
+
 class myQDialog(QtGui.QDialog):
+    """Reimplement QDialog to start a given thread shortly after the dialog is displayed"""
 
-        def __init__(self, workerThread):
-            super(myQDialog, self).__init__()
-            self.workerThread = workerThread
+    def __init__(self, workerThread):
+        super(myQDialog, self).__init__()
+        self.workerThread = workerThread
+        self.timer = None
+
+    def showEvent(self, event):
+        super(myQDialog, self).showEvent(event)
+        self.timer = self.startTimer(200)
+
+    def timerEvent(self, event):
+        super(myQDialog, self).timerEvent(event)
+        self.workerThread.start()
+        if (self.timer):
+            self.killTimer(self.timer)
             self.timer = None
-
-        def showEvent(self, event):
-            super(myQDialog, self).showEvent(event)
-            self.timer = self.startTimer(200)
-
-        def timerEvent(self, event):
-            super(myQDialog, self).timerEvent(event)
-            self.workerThread.start()
-            if (self.timer):
-                self.killTimer(self.timer)
-                self.timer = None
