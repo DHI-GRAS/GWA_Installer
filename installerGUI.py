@@ -151,6 +151,7 @@ LOGOS = {
 LOGOS['Postgres'] = LOGOS['PostGIS']
 LOGOS['MapWindow'] = LOGOS['SWAT']
 LOGOS['SWAT editor'] = LOGOS['SWAT']
+LOGOS['TauDEM/MPI'] = LOGOS['TauDEM']
 
 
 UNINSTALL_LABEL = (
