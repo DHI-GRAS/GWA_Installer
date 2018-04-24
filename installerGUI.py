@@ -70,9 +70,6 @@ DESCRIPTIONS = {
     'TauDEM': (
         "TauDEM (Terrain Analysis Using Digital Elevation Models) "
         "is used to extract and analyse hydrologic information from topography."),
-    'TauDEM/MPI': (
-        "TauDEM (Terrain Analysis Using Digital Elevation Models) "
-        "is used to extract and analyse hydrologic information from topography."),
     'PostGIS': (
         "PostGIS is a geospatial database used by GWA Toolbox for storing certain "
         "types of data. It is not necessary to have it installed on every computer "
@@ -86,6 +83,7 @@ DESCRIPTIONS = {
 DESCRIPTIONS['Postgres'] = DESCRIPTIONS['PostGIS']
 DESCRIPTIONS['MapWindow'] = DESCRIPTIONS['SWAT']
 DESCRIPTIONS['SWAT editor'] = DESCRIPTIONS['SWAT']
+DESCRIPTIONS['TauDEM/MPI'] = DESCRIPTIONS['TauDEM']
 
 INSTALL_INSTRUCTIONS = {
     'OSGeo4W': (
