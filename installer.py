@@ -1,31 +1,7 @@
-"""
-***************************************************************************
-   installer.py
--------------------------------------
-    Copyright (C) 2016 globWetland Africa (www.globwetland-africa.org)
-
-***************************************************************************
-* The GlobWetland Africa toolbox has been developed as part of the Glob-  *
-* Wetland Africa project funded by the European Space Agency (ESA) in     *
-* partnership with the Africa Team of the Ramsar Convention on Wetlands.  *
-*                                                                         *
-* The Toolbox is a free software i.e. you can redistribute it and/or      *
-* modify it under the terms of the GNU General Public License as publis-  *
-* hed by the Free Software Foundation, either version 3 of the License,   *
-* or (at your option) any later version.                                  *
-*                                                                         *
-* The Toolbox is distributed in the hope that it will be useful, but      *
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTA-   *
-* BILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public *
-* License for more details.                                               *
-*                                                                         *
-* You should have received a copy of the GNU General Public License along *
-* with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-***************************************************************************
-"""
 import os
 import sys
 import glob
+import time
 import errno
 import shutil
 import functools
@@ -39,11 +15,7 @@ from distutils import dir_util
 
 from PyQt4 import QtCore, QtGui
 from installerGUI import installerWelcomeWindow
-from installerGUI import osgeo4wInstallWindow, osgeo4wPostInstallWindow
-from installerGUI import beamInstallWindow, beamPostInstallWindow
-from installerGUI import snapInstallWindow, snapPostInstallWindow
-from installerGUI import rInstallWindow, rPostInstallWindow
-from installerGUI import postgreInstallWindow, postgisInstallWindow
+from installerGUI import GenericInstallWindow, DirPathPostInstallWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow
 from installerGUI import cmdWaitWindow
 from installerGUI import uninstallInstructionsWindow
@@ -89,8 +61,12 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win32_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
+                taudemInstall = None
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
+                mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
+                mwswatInstall = _joinbindir("MWSWAT2009.exe")
+                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -99,8 +75,12 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win64_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
+                taudemInstall = _joinbindir("TauDEM537_setup.exe")
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
+                mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
+                mwswatInstall = _joinbindir("MWSWAT2009.exe")
+                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             else:
                 self.util.error_exit(
                     'Neither 32 bit nor 64 bit instalations directory exists. '
@@ -109,16 +89,23 @@ class Installer():
             # select default installation directories for 32 or 64 bit install
             if is32bit:
                 install_dirs = {
-                    'osgeo4w': "C:\\OSGeo4W",
-                    'snap': "C:\\Program Files\\snap",
-                    'beam': "C:\\Program Files\\beam-5.0",
-                    'r': "C:\\Program Files\\R\\R-3.3.2"}
+                    'OSGeo4W': "C:\\OSGeo4W",
+                    'SNAP': "C:\\Program Files\\SNAP",
+                    'BEAM': "C:\\Program Files\\BEAM-5.0",
+                    'R': "C:\\Program Files\\R\\R-3.3.2",
+                    'TauDEM': None,
+                    'TauDEM/MPI': None,
+                    'mapwindow': "C:\\Program Files\\MapWindow",
+                }
             else:
                 install_dirs = {
-                    'osgeo4w': "C:\\OSGeo4W64",
-                    'snap': "C:\\Program Files\\snap",
-                    'beam': "C:\\Program Files\\beam-5.0",
-                    'r': "C:\\Program Files\\R\\R-3.3.2"}
+                    'OSGeo4W': "C:\\OSGeo4W64",
+                    'SNAP': "C:\\Program Files\\SNAP",
+                    'BEAM': "C:\\Program Files\\BEAM-5.0",
+                    'R': "C:\\Program Files\\R\\R-3.3.2",
+                    'TauDEM': r'C:\Program Files\TauDEM\TauDEM5Exe',
+                    'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin',
+                    'mapwindow': "C:\\Program Files (x86)\\MapWindow"}
 
         elif res == CANCEL:
             del self.dialog
@@ -137,7 +124,7 @@ class Installer():
         ########################################################################
         # Install OSGeo4W (QGIS, OTB, SAGA, GRASS)
 
-        self.dialog = osgeo4wInstallWindow()
+        self.dialog = GenericInstallWindow('OSGeo4W')
         res = self.showDialog()
 
         # run the OSGeo4W installation here as an outside process
@@ -152,12 +139,12 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = osgeo4wPostInstallWindow(install_dirs['osgeo4w'])
+        self.dialog = DirPathPostInstallWindow('OSGeo4W', install_dirs['OSGeo4W'])
         res = self.showDialog()
 
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
-            install_dirs['osgeo4w'] = str(self.dialog.dirPathText.toPlainText())
+            install_dirs['OSGeo4W'] = str(self.dialog.dirPathText.toPlainText())
 
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
@@ -191,7 +178,7 @@ class Installer():
 
             # copy additional python packages
             site_packages_dir = os.path.join(
-                install_dirs['osgeo4w'], 'apps', 'Python27', 'Lib', 'site-packages')
+                install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
             python_packages = glob.glob(os.path.join(QGIS_extras_dir, 'python_packages', '*.zip'))
             logger.info('Found python packages: %s', python_packages)
             for zipfname in python_packages:
@@ -201,14 +188,14 @@ class Installer():
             # install additional python packages with pip
             pip_package_dir = os.path.join(QGIS_extras_dir, 'python_packages_pip')
             cmd, cmdkw = self.util.cmd_install_pip_offline(
-                osgeo_root=install_dirs['osgeo4w'],
+                osgeo_root=install_dirs['OSGeo4W'],
                 package_dir=pip_package_dir)
             self.dialog = cmdWaitWindow(self.util, cmd, **cmdkw)
             self.showDialog()
 
             # activate plugins and processing providers
             self.util.activatePlugins()
-            self.util.activateProcessingProviders(install_dirs['osgeo4w'])
+            self.util.activateProcessingProviders(install_dirs['OSGeo4W'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -220,13 +207,13 @@ class Installer():
         # #######################################################################
         # Install BEAM
 
-        self.dialog = beamInstallWindow()
+        self.dialog = GenericInstallWindow('BEAM')
         res = self.showDialog()
 
         # run the BEAM installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(beamInstall)
-            # self.dialog =  beamPostInstallWindow(install_dirs['beam']);
+            # self.dialog =  beamPostInstallWindow(install_dirs['BEAM']);
             # res = self.showDialog()
         elif res == SKIP:
             pass
@@ -237,12 +224,12 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = beamPostInstallWindow(install_dirs['beam'])
+        self.dialog = DirPathPostInstallWindow('BEAM', install_dirs['BEAM'])
         res = self.showDialog()
 
         # copy the additional BEAM modules and set the amount of memory to be used with GPT
         if res == NEXT:
-            dirPath = install_dirs['beam'] = str(self.dialog.dirPathText.toPlainText())
+            dirPath = install_dirs['BEAM'] = str(self.dialog.dirPathText.toPlainText())
             dstPath = os.path.join(dirPath, "modules")
             srcPath = "BEAM additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
@@ -266,7 +253,7 @@ class Installer():
         ########################################################################
         # Install Snap Toolbox
 
-        self.dialog = snapInstallWindow()
+        self.dialog = GenericInstallWindow('SNAP')
         res = self.showDialog()
 
         # run the Snap installation here as an outside process
@@ -281,17 +268,17 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = snapPostInstallWindow(install_dirs['snap'])
+        self.dialog = DirPathPostInstallWindow('SNAP', install_dirs['SNAP'])
         res = self.showDialog()
 
         # Set the amount of memory to be used with NEST GPT
         if res == NEXT:
-            install_dirs['snap'] = str(self.dialog.dirPathText.toPlainText())
+            install_dirs['SNAP'] = str(self.dialog.dirPathText.toPlainText())
             site_packages_dir = os.path.join(
-                install_dirs['osgeo4w'], 'apps', 'Python27', 'Lib', 'site-packages')
+                install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
             # configure snappy
-            confbat = os.path.join(install_dirs['snap'], 'bin', 'snappy-conf.bat')
-            osgeopython = os.path.join(install_dirs['osgeo4w'], 'bin', 'python.exe')
+            confbat = os.path.join(install_dirs['SNAP'], 'bin', 'snappy-conf.bat')
+            osgeopython = os.path.join(install_dirs['OSGeo4W'], 'bin', 'python.exe')
             cmd = [confbat, osgeopython, site_packages_dir]
             self.dialog = cmdWaitWindow(self.util, cmd, notify=True)
             self.showDialog()
@@ -301,29 +288,29 @@ class Installer():
                 f.write(
                     '[DEFAULT]\n'
                     'snap_home: {}\n'
-                    .format(install_dirs['snap']))
+                    .format(install_dirs['SNAP']))
 
             jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
             replace = {
-                'java_home': '"{}"'.format(os.path.join(install_dirs['snap'], 'jre')),
+                'java_home': '"{}"'.format(os.path.join(install_dirs['SNAP'], 'jre')),
                 'jvm_dll': 'None'}
             installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
 
             # 32 bit systems usually have less RAM so assign less to S1 Toolbox
             ram_fraction = 0.4 if is32bit else 0.6
-            settingsfile = os.path.join(install_dirs['snap'], 'bin', 'gpt.vmoptions')
+            settingsfile = os.path.join(install_dirs['SNAP'], 'bin', 'gpt.vmoptions')
             try:
                 installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)
             except IOError as exc:
                 self.util.error_exit(str(exc))
-            # There is a bug in snap installer so the gpt file has to be
+            # There is a bug in SNAP installer so the gpt file has to be
             # modified for 32 bit installation
             if is32bit:
                 try:
                     installer_utils.removeIncompatibleJavaOptions(settingsfile)
                 except IOError as exc:
                     self.error_exit(str(exc))
-            self.util.activateSNAPplugin(install_dirs['snap'])
+            self.util.activateSNAPplugin(install_dirs['SNAP'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -335,13 +322,13 @@ class Installer():
         # #######################################################################
         # Install R
 
-        self.dialog = rInstallWindow()
+        self.dialog = GenericInstallWindow('R')
         res = self.showDialog()
 
         # run the R installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(rInstall)
-            # self.dialog = rPostInstallWindow(install_dirs['r'])
+            # self.dialog = rPostInstallWindow(install_dirs['R'])
             # res = self.showDialog()
         elif res == SKIP:
             pass
@@ -352,22 +339,63 @@ class Installer():
             self.unknownActionPopup()
 
         # ask for post-installation even if user has skipped installation
-        self.dialog = rPostInstallWindow(install_dirs['r'])
+        self.dialog = DirPathPostInstallWindow('R', install_dirs['R'])
         res = self.showDialog()
 
         # Copy the R additional libraries
         if res == NEXT:
-            dirPath = install_dirs['r'] = str(self.dialog.dirPathText.toPlainText())
-            dstPath = os.path.join(dirPath, "library")
+            install_dirs['R'] = str(self.dialog.dirPathText.toPlainText())
+            dstPath = os.path.join(install_dirs['R'], "library")
             srcPath = "R additional libraries"
             # show dialog because it might take some time on slower computers
             self.dialog = extractingWaitWindow(
                 self.util, os.path.join(srcPath, "libraries.zip"), dstPath)
             self.showDialog()
             if is32bit:
-                self.util.activateRplugin(dirPath, "false")
+                self.util.activateRplugin(install_dirs['R'], "false")
             else:
-                self.util.activateRplugin(dirPath, "true")
+                self.util.activateRplugin(install_dirs['R'], "true")
+        elif res == SKIP:
+            pass
+        elif res == CANCEL:
+            del self.dialog
+            return
+        else:
+            self.unknownActionPopup()
+
+        ########################################################################
+        # Install TauDEM
+
+        self.dialog = GenericInstallWindow('TauDEM')
+        res = self.showDialog()
+        if res == NEXT:
+            # TauDEM
+            self.util.execSubprocess(taudemInstall)
+            self.dialog = DirPathPostInstallWindow('TauDEM', install_dirs['TauDEM'])
+            res = self.showDialog()
+            if res == NEXT:
+                install_dirs['TauDEM'] = str(self.dialog.dirPathText.toPlainText())
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+            # MPI
+            self.util.execSubprocess(taudemInstall)
+            self.dialog = DirPathPostInstallWindow('TauDEM/MPI', install_dirs['TauDEM/MPI'])
+            res = self.showDialog()
+            if res == NEXT:
+                install_dirs['TauDEM/MPI'] = str(self.dialog.dirPathText.toPlainText())
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+            self.activateTaudem(install_dirs['TauDEM'], install_dirs['TauDEM/MPI'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -380,7 +408,7 @@ class Installer():
         # Install PostGIS
         postgres_installed = False
 
-        self.dialog = postgreInstallWindow()
+        self.dialog = GenericInstallWindow('Postgres')
         res = self.showDialog()
 
         # install Postgres
@@ -397,10 +425,105 @@ class Installer():
 
         if postgres_installed:
             # install PostGIS
-            self.dialog = postgisInstallWindow()
+            self.dialog = GenericInstallWindow('PostGIS')
             res = self.showDialog()
             if res == NEXT:
                 self.util.execSubprocess(postgisInstall)
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+
+        ########################################################################
+        # Install MapWindow, SWAT and PEST
+        mapwindow_installed = False
+        mswat_installed = False
+        swateditor_installed = False
+
+        # install MapWindow
+        self.dialog = GenericInstallWindow('MapWindow')
+        res = self.showDialog()
+        if res == NEXT:
+            self.util.execSubprocess(mapwindowInstall)
+            mapwindow_installed = True
+        elif res == SKIP:
+            pass
+        elif res == CANCEL:
+            del self.dialog
+            return
+        else:
+            self.unknownActionPopup()
+
+        if mapwindow_installed:
+            # install MS SWAT
+            self.dialog = GenericInstallWindow('MWSWAT')
+            res = self.showDialog()
+            if res == NEXT:
+                self.util.execSubprocess(mwswatInstall)
+                mswat_installed = True
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+
+        if mswat_installed:
+            # install SWAT editor
+            self.dialog = GenericInstallWindow('SWAT editor')
+            res = self.showDialog()
+            if res == NEXT:
+                self.util.execSubprocess(swateditorInstall)
+                time.sleep(5)
+                swateditor_installed = True
+            elif res == SKIP:
+                pass
+            elif res == CANCEL:
+                del self.dialog
+                return
+            else:
+                self.unknownActionPopup()
+
+        if swateditor_installed:
+            # install SWAT post-installation stuff
+            self.dialog = DirPathPostInstallWindow('MWSWAT', install_dirs['mapwindow'])
+            res = self.showDialog()
+            if res == NEXT:
+                # copy the DTU customised MWSWAT 2009 installation
+                install_dirs['mapwindow'] = dirPath = str(self.dialog.dirPathText.toPlainText())
+                mwswatPath = os.path.join(dirPath, "Plugins", "MWSWAT2009")
+                dstPath = os.path.join(mwswatPath, 'swat2009DtuEnvVers0.2')
+                srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
+                self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
+                self.showDialog()
+
+                # copy and rename the customised MWSWAT exe
+                oldexe = os.path.join(mwswatPath, "swat2009rev481.exe_old")
+                revexe = os.path.join(mwswatPath, "swat2009rev481.exe")
+                newexe = os.path.join(dstPath, "swat2009DtuEnv.exe")
+
+                if os.path.isfile(oldexe):
+                    os.remove(oldexe)
+                os.rename(revexe, oldexe)
+
+                self.util.copyFiles(newexe, mwswatPath)
+                if os.path.isfile(revexe):
+                    os.remove(revexe)
+                os.rename(newexe, revexe)
+
+                # copy the modified database file
+                self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
+                # copy PEST
+                self.dialog = copyingWaitWindow(
+                    self.util, "MWSWAT additional software\\PEST",
+                    os.path.join(mwswatPath, "PEST"))
+                self.showDialog()
+                # activate the plugin
+                self.util.activateSWATplugin(dirPath)
             elif res == SKIP:
                 pass
             elif res == CANCEL:
@@ -632,37 +755,37 @@ class Utilities(QtCore.QObject):
 
     def activatePlugins(self):
         self.activateThis(
-                "PythonPlugins/atmospheric_correction",
-                "PythonPlugins/processing_workflow",
-                "PythonPlugins/processing_SWAT",
-                "PythonPlugins/openlayers_plugin",
-                "PythonPlugins/photo2shape",
-                "PythonPlugins/pointsamplingtool",
-                "PythonPlugins/processing",
-                "PythonPlugins/temporalprofiletool",
-                "PythonPlugins/valuetool",
-                "plugins/zonalstatisticsplugin")
+            "PythonPlugins/atmospheric_correction",
+            "PythonPlugins/processing_workflow",
+            "PythonPlugins/processing_SWAT",
+            "PythonPlugins/openlayers_plugin",
+            "PythonPlugins/photo2shape",
+            "PythonPlugins/pointsamplingtool",
+            "PythonPlugins/processing",
+            "PythonPlugins/temporalprofiletool",
+            "PythonPlugins/valuetool",
+            "plugins/zonalstatisticsplugin")
 
     def activateProcessingProviders(self, osgeodir):
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS70", "true")
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS", "true")
         self.activateThis(
-                "Processing/configuration/ACTIVATE_MODEL",
-                "Processing/configuration/ACTIVATE_OTB",
-                "Processing/configuration/ACTIVATE_QGIS",
-                "Processing/configuration/ACTIVATE_SAGA",
-                "Processing/configuration/ACTIVATE_DHIGRAS",
-                "Processing/configuration/ACTIVATE_SCRIPT",
-                "Processing/configuration/ACTIVATE_WORKFLOW",
-                "Processing/configuration/ACTIVATE_GWA_TBX",
-                "Processing/configuration/ACTIVATE_WOIS_TOOLBOX",
-                "Processing/configuration/ACTIVATE_WG9HM",
-                "Processing/configuration/GRASS_LOG_COMMANDS",
-                "Processing/configuration/GRASS_LOG_CONSOLE",
-                "Processing/configuration/SAGA_LOG_COMMANDS",
-                "Processing/configuration/SAGA_LOG_CONSOLE",
-                "Processing/configuration/USE_FILENAME_AS_LAYER_NAME",
-                "Processing/configuration/TASKBAR_BUTTON_GWA_TBX")
+            "Processing/configuration/ACTIVATE_MODEL",
+            "Processing/configuration/ACTIVATE_OTB",
+            "Processing/configuration/ACTIVATE_QGIS",
+            "Processing/configuration/ACTIVATE_SAGA",
+            "Processing/configuration/ACTIVATE_DHIGRAS",
+            "Processing/configuration/ACTIVATE_SCRIPT",
+            "Processing/configuration/ACTIVATE_WORKFLOW",
+            "Processing/configuration/ACTIVATE_GWA_TBX",
+            "Processing/configuration/ACTIVATE_WOIS_TOOLBOX",
+            "Processing/configuration/ACTIVATE_WG9HM",
+            "Processing/configuration/GRASS_LOG_COMMANDS",
+            "Processing/configuration/GRASS_LOG_CONSOLE",
+            "Processing/configuration/SAGA_LOG_COMMANDS",
+            "Processing/configuration/SAGA_LOG_CONSOLE",
+            "Processing/configuration/USE_FILENAME_AS_LAYER_NAME",
+            "Processing/configuration/TASKBAR_BUTTON_GWA_TBX")
         self.setQGISSettings("Processing/configuration/TASKBAR_BUTTON_WORKFLOW", "false")
         # GRASS_FOLDER depends on GRASS version and must be set explicitly here
         try:
@@ -677,24 +800,38 @@ class Utilities(QtCore.QObject):
 
     def activateBEAMplugin(self, dirPath):
         self.activateThis(
-                "PythonPlugins/processing_gpf",
-                "Processing/configuration/ACTIVATE_BEAM")
+            "PythonPlugins/processing_gpf",
+            "Processing/configuration/ACTIVATE_BEAM")
         self.setQGISSettings("Processing/configuration/BEAM_FOLDER", dirPath)
 
     def activateSNAPplugin(self, dirPath):
         self.activateThis(
-                "PythonPlugins/processing_gpf",
-                "Processing/configuration/ACTIVATE_SNAP")
+            "PythonPlugins/processing_gpf",
+            "Processing/configuration/ACTIVATE_SNAP")
         self.activateThis(
-                "Processing/configuration/S1TBX_ACTIVATE",
-                "Processing/configuration/S2TBX_ACTIVATE")
+            "Processing/configuration/S1TBX_ACTIVATE",
+            "Processing/configuration/S2TBX_ACTIVATE")
         self.setQGISSettings("Processing/configuration/SNAP_FOLDER", dirPath)
 
     def activateRplugin(self, dirPath, use64):
         self.activateThis(
-                "Processing/configuration/ACTIVATE_R")
+            "Processing/configuration/ACTIVATE_R")
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
+
+    def activateTaudem(self, taudem, mpiexec):
+        self.activateThis(
+            "Processing/configuration/ACTIVATE_TAUDEM",
+            "Processing/configuration/TAUDEM_USE_SINGLEFILE",
+        )
+        self.setQGISSettings("Processing/configuration/TAUDEM_FOLDER", taudem)
+        self.setQGISSettings("Processing/configuration/MPIEXEC_FOLDER", mpiexec)
+
+    def activateSWATplugin(self, dirPath):
+        self.activateThis(
+            "PythonPlugins/processing_SWAT",
+            "Processing/configuration/ACTIVATE_WG9HM")
+        self.setQGISSettings("Processing/configuration/MAPWINDOW_FOLDER", dirPath)
 
 
 if __name__ == '__main__':

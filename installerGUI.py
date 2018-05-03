@@ -26,7 +26,8 @@
 import os
 
 from PyQt4 import QtCore, QtGui
-from ui import welcomeDialog, installComponentDialog, postInstallComponentDialog, componentInstructionsDialog
+from ui import welcomeDialog, installComponentDialog
+from ui import postInstallComponentDialog, componentInstructionsDialog
 
 # MACROS
 try:
@@ -49,21 +50,137 @@ CANCEL = QtGui.QDialog.Rejected
 NEXT = QtGui.QDialog.Accepted
 SKIP = QtGui.QDialog.Accepted + 1
 
+WINDOW_TITLE = "GWA Toolbox Installation - Install {name}"
 
 
-##################################################################################
+DESCRIPTIONS = {
+    'OSGeo4W': (
+        "QGIS is the main GUI used by GWA Toolbox while Orfeo Toolbox and GRASS GIS "
+        "provide many of the commonly used data processing functions. They are installed "
+        "together through the OSGeo4W installer."),
+    'SNAP': (
+        "Snap Toolbox is a software for analyzing data derived with satellites operated "
+        "by European Space Agency (ESA) and other organisations."),
+    'BEAM': (
+        "BEAM is a software for analyzing optical and thermal data derived with "
+        "satellites operated by European Space Agency (ESA) and other organisation."),
+    'R': (
+        "R is a statistical scripting language used by GWA Toolbox for various "
+        "data processing tasks."),
+    'TauDEM': (
+        "TauDEM (Terrain Analysis Using Digital Elevation Models) "
+        "is used to extract and analyse hydrologic information from topography."),
+    'PostGIS': (
+        "PostGIS is a geospatial database used by GWA Toolbox for storing certain "
+        "types of data. It is not necessary to have it installed on every computer "
+        "using GWA Toolbox, since the database can run from a central server. Therefore "
+        "its installation is optional."),
+    'SWAT': (
+        "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced "
+        "component and not every user requires the hydrological modeling functionality. "
+        "Therefore its installation is optional."),
+}
+DESCRIPTIONS['Postgres'] = DESCRIPTIONS['PostGIS']
+DESCRIPTIONS['MapWindow'] = DESCRIPTIONS['SWAT']
+DESCRIPTIONS['SWAT editor'] = DESCRIPTIONS['SWAT']
+DESCRIPTIONS['TauDEM/MPI'] = DESCRIPTIONS['TauDEM']
+
+INSTALL_INSTRUCTIONS = {
+    'OSGeo4W': (
+        "After clicking on the \"Install\" button the OSGeo4W installer will start. "
+        "The process should be automatic but if any question dialogs pop-up just click OK."),
+    'BEAM': (
+        "After clicking on the \"Install\" button the BEAM installer will start. "
+        "In the installer you will be asked to accept the BEAM license conditions "
+        "followed by a couple of installation questions. In all the questions you "
+        "can keep the default answers by clicking \"Next >\" until the installation starts."),
+    "SNAP": (
+        "After clicking on the \"Install\" button the Snap Toolbox installer will start. "
+        "In the installer you will be asked to accept the Snap Toolbox license conditions "
+        "followed by a couple of installation questions. In all the questions you can keep "
+        "the default answers by clicking \"Next >\" until the installation starts."),
+    'R': (
+        "After clicking on the \"Install\" button the R installer will start. "
+        "In the installer you will be asked to accept the R license conditions "
+        "followed by a couple of installation questions. In all the questions "
+        "you can keep the default answers by clicking \"Next >\" until the "
+        "installation starts."),
+    'TauDEM': (
+        "After clicking on the \"Install\" button the TauDEM installer will start. "
+        "It will install several components. In the GDAL installation, choose \"Typical\". "
+        "If you change the TauDEM or MPI default directories, you must enter these in the "
+        "following post-installation steps."),
+    'Postgres': (
+        "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer "
+        "will start. We recommend that you keep all the default options and use "
+        "<b>\"postgres\"</b> for both username and password (and remember this choice). "
+        "In the last step make sure that the option to launch Stack Builder "
+        "is <b>NOT</b> selected."),
+    'PostGIS': (
+        "After clicking on the \"Install\" button the PostGIS installer will start. You need "
+        "to accept the license and then when choosing components to install select 'PostGIS' "
+        "<b>but not 'Create spatial database'</b>. If any questions pop up just click Yes."),
+    'MapWindow': (
+        "After clicking on the \"Install\" button the MapWindow installer will start. MapWindow "
+        "is used as front end for setting up new SWAT models. During the installation keep all "
+        "the default options"),
+    'MWSWAT': (
+        "After clicking on the \"Install\" button the MWSWAT 2009 installer will start. "
+        "MWSWAT is the SWAT implementation used by GWA Toolbox. During the installation "
+        "keep all the default options"),
+    'SWAT editor': (
+        "After clicking on the \"Install\" button the SWAT editor installer will start. "
+        "SWAT editor is used for setting up new SWAT models. During the installation keep "
+        "all the default options"),
+}
+
+LOGOS = {
+    'main': 'images/GWA_logo.png',
+    'main_ico': "images/GWA.ico",
+    'OSGeo4W': "images/osgeo4wLogo.png",
+    'BEAM': "images/beamLogo.png",
+    'SNAP': "images/snapLogo.png",
+    'R': "images/rLogo.png",
+    'TauDEM': "images/taudem_logo.png",
+    'PostGIS': "images/postgisLogo.png",
+    'SWAT': "images/swatLogo.png",
+    'MWSWAT': "images/mwswatLogo.png",
+}
+LOGOS['Postgres'] = LOGOS['PostGIS']
+LOGOS['MapWindow'] = LOGOS['SWAT']
+LOGOS['SWAT editor'] = LOGOS['SWAT']
+LOGOS['TauDEM/MPI'] = LOGOS['TauDEM']
+
+
+UNINSTALL_LABEL = (
+    "For a smooth installation process, some of the old components of GWA Toolbox "
+    "have to be uninstalled if they are present on your computer.")
+
+UNINSTALL_INSTRUCTIONS = (
+    "Please follow the uninstallation instructions present in the 'GWA Toolbox installation' "
+    "document located in the GWA Toolbox installation directory.")
+
+POSTINSTALL_INSTRUCTIONS = (
+    "The GWA Toolbox installer will now perform additional post-installation "
+    "tasks for {name}. If you changed the {name} installation directory during "
+    "the previous step (or skipped the step), make sure that you check the "
+    "path to the directory below and update it if necessary.")
+
+
+# #################################################################################
 # Parent classes
 # Used to avoid overwriting the files produced by QtDesigner and pyuic4
 # Mostly assign actions to buttons and set up the dialog
 
 class installerBaseWindow():
-    def __init__(self, MainWindow = None):
+    def __init__(self, MainWindow=None):
         if MainWindow:
             self.MainWindow = MainWindow
         else:
             self.MainWindow = QtGui.QDialog()
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("images/GWA.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main_ico'])),
+                       QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.MainWindow.setWindowIcon(icon)
 
     def exec_(self):
@@ -78,21 +195,24 @@ class installerBaseWindow():
     def skip(self):
         self.MainWindow.done(SKIP)
 
+
 class installerWelcomeWindow(installerBaseWindow, welcomeDialog.Ui_Dialog):
 
     def __init__(self):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
         QtCore.QObject.connect(self.beginButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
 
+
 class installWindow(installerBaseWindow, installComponentDialog.Ui_Dialog):
+
     def __init__(self):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
         QtCore.QObject.connect(self.installButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.skipButton, QtCore.SIGNAL("clicked()"), self.skip)
@@ -100,38 +220,78 @@ class installWindow(installerBaseWindow, installComponentDialog.Ui_Dialog):
 
 
 class postInstallWindow(installerBaseWindow, postInstallComponentDialog.Ui_Dialog):
+
     def __init__(self):
         installerBaseWindow.__init__(self)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
         QtCore.QObject.connect(self.continueButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.skipButton, QtCore.SIGNAL("clicked()"), self.skip)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
-        QtCore.QObject.connect(self.dirSelectionButton, QtCore.SIGNAL("clicked()"), self.dirSelection)
+        QtCore.QObject.connect(self.dirSelectionButton, QtCore.SIGNAL("clicked()"),
+                               self.dirSelection)
 
     def dirSelection(self):
         path = QtGui.QFileDialog.getExistingDirectory(directory=self.dirPathText.toPlainText())
         if not path.isNull():
             self.dirPathText.setPlainText(_translate("MainWindow", path, None))
 
+
 class instructionsWindow(installerBaseWindow, componentInstructionsDialog.Ui_Dialog):
 
     # This window can have a reimplemented QDialog used as the main window to allow
     # for multithreaded operations while the window is displayed
-    def __init__(self, MainWindow = None):
+    def __init__(self, MainWindow=None):
 
         installerBaseWindow.__init__(self, MainWindow)
         self.setupUi(self.MainWindow)
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/GWA_logo.png")))
+        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
         QtCore.QObject.connect(self.continueButton, QtCore.SIGNAL("clicked()"), self.next)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
 
 
-###############################################################################
+# ##############################################################################
 # Child classes
 # Individualise the parent classes mostly by changing the text
+
+
+class GenericInstallWindow(installWindow):
+
+    def __init__(self, name):
+        self.name = name
+        installWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS[self.name])))
+
+    def retranslateUi(self, MainWindow):
+        super(GenericInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate(
+            "MainWindow", DESCRIPTIONS[self.name], None))
+        self.instructionMainLabel.setText(_translate(
+            "MainWindow", INSTALL_INSTRUCTIONS[self.name], None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", WINDOW_TITLE.format(name=self.name), None))
+
+
+class DirPathPostInstallWindow(postInstallWindow):
+
+    def __init__(self, name, default_path):
+        self.name = name
+        self.default_path = default_path
+        postInstallWindow.__init__(self)
+        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS[name])))
+
+    def retranslateUi(self, MainWindow):
+        super(DirPathPostInstallWindow, self).retranslateUi(MainWindow)
+        self.topLabel.setText(_translate(
+            "MainWindow", DESCRIPTIONS[self.name], None))
+        self.instructionsMainLabel.setText(_translate(
+            "MainWindow", POSTINSTALL_INSTRUCTIONS.format(name=self.name), None))
+        self.dirPathText.setPlainText(_translate(
+            "MainWindow", self.default_path, None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", WINDOW_TITLE.format(name=self.name), None))
 
 
 # Instructions for activating GWA Toolbox plugins
@@ -141,138 +301,12 @@ class uninstallInstructionsWindow(instructionsWindow):
 
     def retranslateUi(self, MainWindow):
         super(uninstallInstructionsWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "For smooth installation process some of the old components of GWA Toolbox have to be uninstalled if they are present on your computer.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "Please follow the uninstallation instructions present in the 'GWA Toolbox installation' document located in the GWA Toolbox installation directory.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Uninstall old version", None))
+        self.topLabel.setText(_translate("MainWindow", UNINSTALL_INSTRUCTIONS, None))
+        self.instructionsMainLabel.setText(_translate("MainWindow", UNINSTALL_INSTRUCTIONS, None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", "GWA Toolbox Installation - Uninstall old version", None))
 
 
-# OSGeo4W
-class osgeo4wInstallWindow(installWindow):
-    def __init__(self):
-        installWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/osgeo4wLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(osgeo4wInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by GWA Toolbox while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. The process should be automatic but if any question dialogs pop-up just click OK.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
-
-class osgeo4wPostInstallWindow(postInstallWindow):
-    def __init__(self, defaultPath):
-        self.defaultPath = defaultPath
-        postInstallWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/osgeo4wLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(osgeo4wPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "QGIS is the main GUI used by GWA Toolbox while Orfeo Toolbox and GRASS GIS provide many of the commonly used data processing functions. They are installed together through the OSGeo4W installer.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for QGIS (activating plugins, copying extra libraries, etc.). If you changed the OSGeo4W/QGIS installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
-        self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install QGIS, Orfeo Toolbox and GRASS GIS", None))
-
-
-# BEAM
-class beamInstallWindow(installWindow):
-    def __init__(self):
-        installWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/beamLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(beamInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "BEAM is a software for analyzing optical and thermal data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the BEAM installer will start. In the installer you will be asked to accept the BEAM license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install BEAM", None))
-
-class beamPostInstallWindow(postInstallWindow):
-    def __init__(self, defaultPath):
-        self.defaultPath = defaultPath
-        postInstallWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/beamLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(beamPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "BEAM is a software for analyzing optical and thermal data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for BEAM (activating plugins, copying extra libraries, etc.). If you changed the BEAM installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
-        self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install BEAM", None))
-
-# SNAP
-class snapInstallWindow(installWindow):
-    def __init__(self):
-        installWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/snapLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(snapInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "Snap Toolbox is a software for analyzing data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the Snap Toolbox installer will start. In the installer you will be asked to accept the Snap Toolbox license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
-
-class snapPostInstallWindow(postInstallWindow):
-    def __init__(self, defaultPath):
-        self.defaultPath = defaultPath
-        postInstallWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/snapLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(snapPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "Snap Toolbox is a software for analyzing data derived with satellites operated by European Space Agency (ESA) and other organisation.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for Snap Toolbox (activating plugins, copying extra libraries, etc.). If you changed the Snap Toolbox installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
-        self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install Snap Toolbox", None))
-
-# R
-class rInstallWindow(installWindow):
-    def __init__(self):
-        installWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/rLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(rInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by GWA Toolbox for various data processing tasks.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the OSGeo4W installer will start. In the installer you will be asked to accept the R license conditions followed by a couple of installation questions. In all the questions you can keep the default answers by clicking \"Next >\" until the installation starts.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
-
-class rPostInstallWindow(postInstallWindow):
-    def __init__(self, defaultPath):
-        self.defaultPath = defaultPath
-        postInstallWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/rLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(rPostInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "R is a statistical scripting language used by GWA Toolbox for various data processing tasks.", None))
-        self.instructionsMainLabel.setText(_translate("MainWindow", "The GWA Toolbox installer will now perform additional post installation tasks for R (activating plugins, copying extra libraries, etc.). If you changed the R installation directory during the previous step (or skipped the step), make sure that you check the path to the directory below and update it if necessary.", None))
-        self.dirPathText.setPlainText(_translate("MainWindow", self.defaultPath, None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install R", None))
-
-# PostGre
-class postgreInstallWindow(installWindow):
-    def __init__(self):
-        installWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/postgisLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(postgreInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by GWA Toolbox for storing certain types of data. It is not necessary to have it installed on every computer using GWA Toolbox, since the database can run from a central server. Therefore its installation is optional.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer will start. We recommend that you keep all the default options and use <b>\"postgres\"</b> for both username and password (and remember this choice). In the last step make sure that the option to launch Stack Builder is <b>NOT</b> selected.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
-
-# PostGIS
-class postgisInstallWindow(installWindow):
-    def __init__(self):
-        installWindow.__init__(self)
-        self.componentLogoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("images/postgisLogo.png")))
-
-    def retranslateUi(self, MainWindow):
-        super(postgisInstallWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(_translate("MainWindow", "PostGIS is a geospatial database used by GWA Toolbox for storing certain types of data. It is not necessary to have it installed on every computer using GWA Toolbox, since the database can run from a central server. Therefore its installation is optional.", None))
-        self.instructionMainLabel.setText(_translate("MainWindow", "After clicking on the \"Install\" button the PostGIS installer will start. You need to accept the license and then when choosing components to install select 'PostGIS' <b>but not 'Create spatial database'</b>. If any questions pop up just click Yes.", None))
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Install PostGIS (Optional)", None))
-
-
-# Finish
 class finishWindow(instructionsWindow):
     def __init__(self):
         instructionsWindow.__init__(self)
@@ -293,7 +327,6 @@ class finishWindow(instructionsWindow):
         self.cancelButton.setText(_translate("MainWindow", "Finish", None))
 
 
-# cmd please wait
 class cmdWaitWindow(instructionsWindow, QtCore.QObject):
 
     def __init__(self, utilities, cmd, **kwargs):
@@ -335,7 +368,6 @@ class cmdWaitWindow(instructionsWindow, QtCore.QObject):
         self.MainWindow.close()
 
 
-# Extracting please wait
 class extractingWaitWindow(instructionsWindow, QtCore.QObject):
 
     def __init__(self, utilities, archivePath, dstPath):
@@ -358,17 +390,17 @@ class extractingWaitWindow(instructionsWindow, QtCore.QObject):
 
     def retranslateUi(self, MainWindow):
         super(extractingWaitWindow, self).retranslateUi(MainWindow)
-        self.topLabel.setText(
-            _translate(
-                "MainWindow",
-                "Extracting an archive ({}). Please wait...".format(os.path.splitext(os.path.basename(self.archivePath))[0]),
-                None))
+        msg = (
+            "Extracting an archive ({}). Please wait..."
+            .format(os.path.splitext(os.path.basename(self.archivePath))[0]))
+        self.topLabel.setText(_translate("MainWindow", msg, None))
         self.instructionsMainLabel.setVisible(False)
         self.continueButton.setVisible(False)
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setVisible(False)
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Extracting an archive", None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", "GWA Toolbox Installation - Extracting an archive", None))
         self.cancelButton.setVisible(False)
 
     def startAction(self):
@@ -378,9 +410,9 @@ class extractingWaitWindow(instructionsWindow, QtCore.QObject):
         self.action = NEXT
         self.MainWindow.close()
 
-# Copying please wait
+
 class copyingWaitWindow(instructionsWindow, QtCore.QObject):
-    def __init__(self, utilities, srcPath, dstPath, checkDstParentExists = False):
+    def __init__(self, utilities, srcPath, dstPath, checkDstParentExists=False):
         QtCore.QObject.__init__(self)
 
         self.utilities = utilities
@@ -407,7 +439,8 @@ class copyingWaitWindow(instructionsWindow, QtCore.QObject):
         self.instructionsHeaderLabel.setVisible(False)
         self.bottomLabel.setVisible(False)
         self.instructionsFooterLabel.setVisible(False)
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "GWA Toolbox Installation - Copying Files", None))
+        self.MainWindow.setWindowTitle(_translate(
+            "MainWindow", "GWA Toolbox Installation - Copying Files", None))
         self.cancelButton.setVisible(False)
 
     def startAction(self):
@@ -417,21 +450,22 @@ class copyingWaitWindow(instructionsWindow, QtCore.QObject):
         self.action = NEXT
         self.MainWindow.close()
 
-# Reimplement QDialog to start a given thread shortly after the dialog is displayed
+
 class myQDialog(QtGui.QDialog):
+    """Reimplement QDialog to start a given thread shortly after the dialog is displayed"""
 
-        def __init__(self, workerThread):
-            super(myQDialog, self).__init__()
-            self.workerThread = workerThread
+    def __init__(self, workerThread):
+        super(myQDialog, self).__init__()
+        self.workerThread = workerThread
+        self.timer = None
+
+    def showEvent(self, event):
+        super(myQDialog, self).showEvent(event)
+        self.timer = self.startTimer(200)
+
+    def timerEvent(self, event):
+        super(myQDialog, self).timerEvent(event)
+        self.workerThread.start()
+        if (self.timer):
+            self.killTimer(self.timer)
             self.timer = None
-
-        def showEvent(self, event):
-            super(myQDialog, self).showEvent(event)
-            self.timer = self.startTimer(200)
-
-        def timerEvent(self, event):
-            super(myQDialog, self).timerEvent(event)
-            self.workerThread.start()
-            if (self.timer):
-                self.killTimer(self.timer)
-                self.timer = None
