@@ -61,7 +61,6 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win32_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
-                taudemInstall = None
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
                 mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
@@ -75,7 +74,6 @@ class Installer():
                 beamInstall = _joinbindir("beam_5.0_win64_installer.exe")
                 snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
-                taudemInstall = _joinbindir("TauDEM537_setup.exe")
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
                 mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
@@ -355,47 +353,6 @@ class Installer():
                 self.util.activateRplugin(install_dirs['R'], "false")
             else:
                 self.util.activateRplugin(install_dirs['R'], "true")
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
-
-        ########################################################################
-        # Install TauDEM
-
-        self.dialog = GenericInstallWindow('TauDEM')
-        res = self.showDialog()
-        if res == NEXT:
-            # TauDEM
-            self.util.execSubprocess(taudemInstall)
-            self.dialog = DirPathPostInstallWindow('TauDEM', install_dirs['TauDEM'])
-            res = self.showDialog()
-            if res == NEXT:
-                install_dirs['TauDEM'] = str(self.dialog.dirPathText.toPlainText())
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-            # MPI
-            self.util.execSubprocess(taudemInstall)
-            self.dialog = DirPathPostInstallWindow('TauDEM/MPI', install_dirs['TauDEM/MPI'])
-            res = self.showDialog()
-            if res == NEXT:
-                install_dirs['TauDEM/MPI'] = str(self.dialog.dirPathText.toPlainText())
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-            self.activateTaudem(install_dirs['TauDEM'], install_dirs['TauDEM/MPI'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -818,14 +775,6 @@ class Utilities(QtCore.QObject):
             "Processing/configuration/ACTIVATE_R")
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
-
-    def activateTaudem(self, taudem, mpiexec):
-        self.activateThis(
-            "Processing/configuration/ACTIVATE_TAUDEM",
-            "Processing/configuration/TAUDEM_USE_SINGLEFILE",
-        )
-        self.setQGISSettings("Processing/configuration/TAUDEM_FOLDER", taudem)
-        self.setQGISSettings("Processing/configuration/MPIEXEC_FOLDER", mpiexec)
 
     def activateSWATplugin(self, dirPath):
         self.activateThis(
