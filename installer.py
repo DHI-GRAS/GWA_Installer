@@ -383,7 +383,6 @@ class Installer():
             else:
                 self.unknownActionPopup()
             # MPI
-            self.util.execSubprocess(taudemInstall)
             self.dialog = DirPathPostInstallWindow('TauDEM/MPI', install_dirs['TauDEM/MPI'])
             res = self.showDialog()
             if res == NEXT:
@@ -395,7 +394,7 @@ class Installer():
                 return
             else:
                 self.unknownActionPopup()
-            self.activateTaudem(install_dirs['TauDEM'], install_dirs['TauDEM/MPI'])
+            self.util.activateTaudem(install_dirs['TauDEM'], install_dirs['TauDEM/MPI'])
         elif res == SKIP:
             pass
         elif res == CANCEL:
