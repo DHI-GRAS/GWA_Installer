@@ -286,14 +286,15 @@ class Installer():
             self.showDialog()
 
             java_max_mem = installer_utils.get_total_ram() * ram_fraction
+            logger.info('Java max mem: {}'.format(java_max_mem))
 
             snappy_ini = os.path.join(site_packages_dir, 'snappy', 'snappy.ini')
             with open(snappy_ini, 'w') as f:
                 f.write(
                     '[DEFAULT]\n'
-                    'snap_home="{}"\n'
+                    'snap_home={}\n'
                     'java_max_mem={:.3f}G\n'
-                    .format(java_max_mem, install_dirs['SNAP']))
+                    .format(install_dirs['SNAP'], java_max_mem))
 
             jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
             replace = {
