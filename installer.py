@@ -292,7 +292,7 @@ class Installer():
                 f.write(
                     '[DEFAULT]\n'
                     'snap_home: {}\n'
-                    'java_max_mem: {}\n'
+                    'java_max_mem: {:.3f}G\n'
                     .format(java_max_mem, install_dirs['SNAP']))
 
             jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
