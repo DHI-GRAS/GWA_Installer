@@ -124,6 +124,10 @@ class Installer():
         ########################################################################
         # Install OSGeo4W (QGIS, OTB, SAGA, GRASS)
 
+        # define RAM fraction to use (SNAP and BEAM)
+        # 32 bit systems usually have less RAM so assign less to BEAM
+        ram_fraction = 0.4 if is32bit else 0.6
+
         self.dialog = GenericInstallWindow('OSGeo4W')
         res = self.showDialog()
 
@@ -234,8 +238,6 @@ class Installer():
             srcPath = "BEAM additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
-            # 32 bit systems usually have less RAM so assign less to BEAM
-            ram_fraction = 0.4 if is32bit else 0.6
             try:
                 installer_utils.modifyRamInBatFiles(
                     os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
@@ -283,12 +285,16 @@ class Installer():
             self.dialog = cmdWaitWindow(self.util, cmd, notify=True)
             self.showDialog()
 
-            snappy_ini = os.path.join(site_packages_dir, 'snappy.ini')
+            java_max_mem = installer_utils.get_total_ram() * ram_fraction
+            logger.info('Java max mem: {}'.format(java_max_mem))
+
+            snappy_ini = os.path.join(site_packages_dir, 'snappy', 'snappy.ini')
             with open(snappy_ini, 'w') as f:
                 f.write(
                     '[DEFAULT]\n'
-                    'snap_home: {}\n'
-                    .format(install_dirs['SNAP']))
+                    'snap_home={}\n'
+                    'java_max_mem={:.3f}G\n'
+                    .format(install_dirs['SNAP'], java_max_mem))
 
             jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
             replace = {
@@ -297,7 +303,6 @@ class Installer():
             installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
 
             # 32 bit systems usually have less RAM so assign less to S1 Toolbox
-            ram_fraction = 0.4 if is32bit else 0.6
             settingsfile = os.path.join(install_dirs['SNAP'], 'bin', 'gpt.vmoptions')
             try:
                 installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)

@@ -12,8 +12,16 @@ from PyQt4 import QtGui
 logger = logging.getLogger('gwa_installer')
 
 
-def _get_ram():
+def get_total_ram():
     """Get amount of physical memory"""
+    if sys.platform != 'win32':
+        msgBox = QtGui.QMessageBox()
+        msgBox.setText(
+            "This installer is only meant for Windows!\n\n "
+            "The installed GWA Toolbox might not work properly.")
+        msgBox.exec_()
+        return
+
     kernel32 = ctypes.windll.kernel32
     c_ulonglong = ctypes.c_ulonglong
 
@@ -33,21 +41,13 @@ def _get_ram():
     memoryStatus = MEMORYSTATUSEX()
     memoryStatus.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
     kernel32.GlobalMemoryStatusEx(ctypes.byref(memoryStatus))
-    return (memoryStatus.ullTotalPhys)
+    return memoryStatus.ullTotalPhys / (1024 * 1024)
 
 
 def modifyRamInBatFiles(batFilePath, useRamFraction):
     logger.info('Setting RAM fraction %s in bat file %s', useRamFraction, batFilePath)
     # Check how much RAM the system has. Only works in Windows
-    if sys.platform != 'win32':
-        msgBox = QtGui.QMessageBox()
-        msgBox.setText(
-            "This installer is only meant for Windows!\n\n "
-            "The installed GWA Toolbox might not work properly.")
-        msgBox.exec_()
-        return
-    totalRam = _get_ram()
-    totalRam = totalRam / (1024 * 1024)
+    totalRam = get_total_ram()
     logger.info('Determined total RAM %d', totalRam)
 
     # Make sure the BEAM/SNAP batch file exists in the given directory
