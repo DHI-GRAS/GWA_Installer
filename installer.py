@@ -146,9 +146,10 @@ class Installer():
         if res == NEXT:
             install_dirs['OSGeo4W'] = str(self.dialog.dirPathText.toPlainText())
 
+            QGIS_extras_dir = os.path.abspath("QGIS additional software")
             # copy the plugins
             dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
-            srcPath = os.path.join("QGIS additional software", "plugins", "plugins.zip")
+            srcPath = os.path.join(QGIS_extras_dir, "plugins", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
                 'mikecprovider',
@@ -167,7 +168,6 @@ class Installer():
             self.showDialog()
 
             # copy scripts and models
-            QGIS_extras_dir = os.path.abspath("QGIS additional software")
             processing_dir = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
             processing_packages = glob.glob(os.path.join(QGIS_extras_dir, '*.zip'))
             logger.info('Found processing packages: %s', processing_packages)
