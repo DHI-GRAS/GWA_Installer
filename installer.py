@@ -302,6 +302,14 @@ class Installer():
                 'jvm_dll': 'None'}
             installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
 
+            # Copy jpy files into snappy directory, otherwise snappy does not work. This is just
+            # a quick fix.
+            for jpy_file in ["jpy.pyd", "jpy-0.9.0.jar", "jpyconfig.properties", "jpyconfig.py",
+                             "jpyutil.py"]:
+                if os.path.exists(os.path.join(site_packages_dir, jpy_file)):
+                    shutil.copy2(os.path.join(site_packages_dir, jpy_file),
+                                 os.path.join(site_packages_dir, "snappy"))
+
             # 32 bit systems usually have less RAM so assign less to S1 Toolbox
             settingsfile = os.path.join(install_dirs['SNAP'], 'bin', 'gpt.vmoptions')
             try:
