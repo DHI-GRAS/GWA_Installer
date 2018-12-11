@@ -69,14 +69,8 @@ DESCRIPTIONS = {
         "data processing tasks."),
     'TauDEM': (
         "TauDEM (Terrain Analysis Using Digital Elevation Models) "
-        "is used to extract and analyse hydrologic information from topography."),
-    'PostGIS': (
-        "PostGIS is a geospatial database used by GWA Toolbox for storing certain "
-        "types of data. It is not necessary to have it installed on every computer "
-        "using GWA Toolbox, since the database can run from a central server. Therefore "
-        "its installation is optional.")
+        "is used to extract and analyse hydrologic information from topography.")
 }
-DESCRIPTIONS['Postgres'] = DESCRIPTIONS['PostGIS']
 DESCRIPTIONS['TauDEM/MPI'] = DESCRIPTIONS['TauDEM']
 
 INSTALL_INSTRUCTIONS = {
@@ -103,17 +97,7 @@ INSTALL_INSTRUCTIONS = {
         "After clicking on the \"Install\" button the TauDEM installer will start. "
         "It will install several components. In the GDAL installation, choose \"Typical\". "
         "If you change the TauDEM or MPI default directories, you must enter these in the "
-        "following post-installation steps."),
-    'Postgres': (
-        "After clicking on the \"Install\" button the PostgreSQL (PostGIS back-end) installer "
-        "will start. We recommend that you keep all the default options and use "
-        "<b>\"postgres\"</b> for both username and password (and remember this choice). "
-        "In the last step make sure that the option to launch Stack Builder "
-        "is <b>NOT</b> selected."),
-    'PostGIS': (
-        "After clicking on the \"Install\" button the PostGIS installer will start. You need "
-        "to accept the license and then when choosing components to install select 'PostGIS' "
-        "<b>but not 'Create spatial database'</b>. If any questions pop up just click Yes.")
+        "following post-installation steps.")
 }
 
 LOGOS = {
@@ -124,9 +108,7 @@ LOGOS = {
     'SNAP': "images/snapLogo.png",
     'R': "images/rLogo.png",
     'TauDEM': "images/taudem_logo.png",
-    'PostGIS': "images/postgisLogo.png"
 }
-LOGOS['Postgres'] = LOGOS['PostGIS']
 LOGOS['TauDEM/MPI'] = LOGOS['TauDEM']
 
 

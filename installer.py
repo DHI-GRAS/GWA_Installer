@@ -61,8 +61,6 @@ class Installer():
                 snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 taudemInstall = None
-                postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
-                postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -72,8 +70,6 @@ class Installer():
                 snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 taudemInstall = _joinbindir("TauDEM537_setup.exe")
-                postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
-                postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
             else:
                 self.util.error_exit(
                     'Neither 32 bit nor 64 bit instalations directory exists. '
@@ -408,39 +404,6 @@ class Installer():
             return
         else:
             self.unknownActionPopup()
-
-        ########################################################################
-        # Install PostGIS
-        postgres_installed = False
-
-        self.dialog = GenericInstallWindow('Postgres')
-        res = self.showDialog()
-
-        # install Postgres
-        if res == NEXT:
-            self.util.execSubprocess(postgreInstall)
-            postgres_installed = True
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
-
-        if postgres_installed:
-            # install PostGIS
-            self.dialog = GenericInstallWindow('PostGIS')
-            res = self.showDialog()
-            if res == NEXT:
-                self.util.execSubprocess(postgisInstall)
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
 
         # Finish
         self.dialog = finishWindow()
