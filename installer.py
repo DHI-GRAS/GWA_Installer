@@ -639,7 +639,6 @@ class Utilities(QtCore.QObject):
 
     def activateProcessingProviders(self, osgeodir):
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS70", "true")
-        self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS", "true")
         self.activateThis(
             "Processing/configuration/ACTIVATE_MODEL",
             "Processing/configuration/ACTIVATE_OTB",
@@ -649,10 +648,8 @@ class Utilities(QtCore.QObject):
             "Processing/configuration/ACTIVATE_SCRIPT",
             "Processing/configuration/ACTIVATE_WORKFLOW",
             "Processing/configuration/ACTIVATE_GWA_TBX",
-            "Processing/configuration/ACTIVATE_WOIS_TOOLBOX",
-            "Processing/configuration/ACTIVATE_WG9HM",
-            "Processing/configuration/GRASS_LOG_COMMANDS",
-            "Processing/configuration/GRASS_LOG_CONSOLE",
+            "Processing/configuration/GRASS7_LOG_COMMANDS",
+            "Processing/configuration/GRASS7_LOG_CONSOLE",
             "Processing/configuration/SAGA_LOG_COMMANDS",
             "Processing/configuration/SAGA_LOG_CONSOLE",
             "Processing/configuration/USE_FILENAME_AS_LAYER_NAME",
@@ -665,7 +662,9 @@ class Utilities(QtCore.QObject):
                 d for d in glob.glob(os.path.join(grass_root, 'grass-*'))
                 if os.path.isdir(d)])
             grassFolder = grass_folders[-1]
-            self.setQGISSettings("Processing/configuration/GRASS_FOLDER", grassFolder)
+            self.setQGISSettings("Processing/configuration/GRASS7_FOLDER", grassFolder)
+            self.setQGISSettings("Processing/configuration/GRASS7_HELP_PATH",
+                                 os.path.join(grassFolder, "docs", "html"))
         except (IndexError, OSError):
             pass
 
