@@ -74,16 +74,9 @@ DESCRIPTIONS = {
         "PostGIS is a geospatial database used by GWA Toolbox for storing certain "
         "types of data. It is not necessary to have it installed on every computer "
         "using GWA Toolbox, since the database can run from a central server. Therefore "
-        "its installation is optional."),
-    'SWAT': (
-        "SWAT is used by GWA Toolbox for hydrological modeling. It is an advanced "
-        "component and not every user requires the hydrological modeling functionality. "
-        "Therefore its installation is optional."),
+        "its installation is optional.")
 }
 DESCRIPTIONS['Postgres'] = DESCRIPTIONS['PostGIS']
-DESCRIPTIONS['MapWindow'] = DESCRIPTIONS['SWAT']
-DESCRIPTIONS['SWAT editor'] = DESCRIPTIONS['SWAT']
-DESCRIPTIONS['MWSWAT'] = DESCRIPTIONS['SWAT']
 DESCRIPTIONS['TauDEM/MPI'] = DESCRIPTIONS['TauDEM']
 
 INSTALL_INSTRUCTIONS = {
@@ -120,19 +113,7 @@ INSTALL_INSTRUCTIONS = {
     'PostGIS': (
         "After clicking on the \"Install\" button the PostGIS installer will start. You need "
         "to accept the license and then when choosing components to install select 'PostGIS' "
-        "<b>but not 'Create spatial database'</b>. If any questions pop up just click Yes."),
-    'MapWindow': (
-        "After clicking on the \"Install\" button the MapWindow installer will start. MapWindow "
-        "is used as front end for setting up new SWAT models. During the installation keep all "
-        "the default options"),
-    'MWSWAT': (
-        "After clicking on the \"Install\" button the MWSWAT 2009 installer will start. "
-        "MWSWAT is the SWAT implementation used by GWA Toolbox. During the installation "
-        "keep all the default options"),
-    'SWAT editor': (
-        "After clicking on the \"Install\" button the SWAT editor installer will start. "
-        "SWAT editor is used for setting up new SWAT models. During the installation keep "
-        "all the default options"),
+        "<b>but not 'Create spatial database'</b>. If any questions pop up just click Yes.")
 }
 
 LOGOS = {
@@ -143,13 +124,9 @@ LOGOS = {
     'SNAP': "images/snapLogo.png",
     'R': "images/rLogo.png",
     'TauDEM': "images/taudem_logo.png",
-    'PostGIS': "images/postgisLogo.png",
-    'SWAT': "images/swatLogo.png",
-    'MWSWAT': "images/mwswatLogo.png",
+    'PostGIS': "images/postgisLogo.png"
 }
 LOGOS['Postgres'] = LOGOS['PostGIS']
-LOGOS['MapWindow'] = LOGOS['SWAT']
-LOGOS['SWAT editor'] = LOGOS['SWAT']
 LOGOS['TauDEM/MPI'] = LOGOS['TauDEM']
 
 

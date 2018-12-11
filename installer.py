@@ -1,7 +1,6 @@
 import os
 import sys
 import glob
-import time
 import errno
 import shutil
 import functools
@@ -64,9 +63,6 @@ class Installer():
                 taudemInstall = None
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x32-setup-2.4.3-1.exe")
-                mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
-                mwswatInstall = _joinbindir("MWSWAT2009.exe")
-                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             elif os.path.isdir(installationsDirs[1]):
                 is32bit = False
                 installationsDir = installationsDirs[1]
@@ -78,9 +74,6 @@ class Installer():
                 taudemInstall = _joinbindir("TauDEM537_setup.exe")
                 postgreInstall = _joinbindir("postgresql-10.2-1-windows-x64.exe")
                 postgisInstall = _joinbindir("postgis-bundle-pg10x64-setup-2.4.3-1.exe")
-                mapwindowInstall = _joinbindir("MapWindowx86Full-v488SR-installer.exe")
-                mwswatInstall = _joinbindir("MWSWAT2009.exe")
-                swateditorInstall = "MWSWAT additional software\\SwatEditor_Install\\Setup.exe"
             else:
                 self.util.error_exit(
                     'Neither 32 bit nor 64 bit instalations directory exists. '
@@ -94,9 +87,7 @@ class Installer():
                     'BEAM': "C:\\Program Files\\BEAM-5.0",
                     'R': "C:\\Program Files\\R\\R-3.3.2",
                     'TauDEM': None,
-                    'TauDEM/MPI': None,
-                    'mapwindow': "C:\\Program Files\\MapWindow",
-                }
+                    'TauDEM/MPI': None}
             else:
                 install_dirs = {
                     'OSGeo4W': "C:\\OSGeo4W64",
@@ -104,8 +95,7 @@ class Installer():
                     'BEAM': "C:\\Program Files\\BEAM-5.0",
                     'R': "C:\\Program Files\\R\\R-3.3.2",
                     'TauDEM': r'C:\Program Files\TauDEM\TauDEM5Exe',
-                    'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin',
-                    'mapwindow': "C:\\Program Files (x86)\\MapWindow"}
+                    'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin'}
 
         elif res == CANCEL:
             del self.dialog
@@ -452,101 +442,6 @@ class Installer():
             else:
                 self.unknownActionPopup()
 
-        ########################################################################
-        # Install MapWindow, SWAT and PEST
-        mapwindow_installed = False
-        mswat_installed = False
-        swateditor_installed = False
-
-        # install MapWindow
-        self.dialog = GenericInstallWindow('MapWindow')
-        res = self.showDialog()
-        if res == NEXT:
-            self.util.execSubprocess(mapwindowInstall)
-            mapwindow_installed = True
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
-
-        if mapwindow_installed:
-            # install MS SWAT
-            self.dialog = GenericInstallWindow('MWSWAT')
-            res = self.showDialog()
-            if res == NEXT:
-                self.util.execSubprocess(mwswatInstall)
-                mswat_installed = True
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-
-        if mswat_installed:
-            # install SWAT editor
-            self.dialog = GenericInstallWindow('SWAT editor')
-            res = self.showDialog()
-            if res == NEXT:
-                self.util.execSubprocess(swateditorInstall)
-                time.sleep(5)
-                swateditor_installed = True
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-
-        if swateditor_installed:
-            # install SWAT post-installation stuff
-            self.dialog = DirPathPostInstallWindow('MWSWAT', install_dirs['mapwindow'])
-            res = self.showDialog()
-            if res == NEXT:
-                # copy the DTU customised MWSWAT 2009 installation
-                install_dirs['mapwindow'] = dirPath = str(self.dialog.dirPathText.toPlainText())
-                mwswatPath = os.path.join(dirPath, "Plugins", "MWSWAT2009")
-                dstPath = os.path.join(mwswatPath, 'swat2009DtuEnvVers0.2')
-                srcPath = "MWSWAT additional software\\swat2009DtuEnvVers0.2"
-                self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
-                self.showDialog()
-
-                # copy and rename the customised MWSWAT exe
-                oldexe = os.path.join(mwswatPath, "swat2009rev481.exe_old")
-                revexe = os.path.join(mwswatPath, "swat2009rev481.exe")
-                newexe = os.path.join(dstPath, "swat2009DtuEnv.exe")
-
-                if os.path.isfile(oldexe):
-                    os.remove(oldexe)
-                os.rename(revexe, oldexe)
-
-                self.util.copyFiles(newexe, mwswatPath)
-                if os.path.isfile(revexe):
-                    os.remove(revexe)
-                os.rename(newexe, revexe)
-
-                # copy the modified database file
-                self.util.copyFiles("MWSWAT additional software\\mwswat2009.mdb", mwswatPath)
-                # copy PEST
-                self.dialog = copyingWaitWindow(
-                    self.util, "MWSWAT additional software\\PEST",
-                    os.path.join(mwswatPath, "PEST"))
-                self.showDialog()
-                # activate the plugin
-                self.util.activateSWATplugin(dirPath)
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-
         # Finish
         self.dialog = finishWindow()
         self.showDialog()
@@ -770,9 +665,7 @@ class Utilities(QtCore.QObject):
 
     def activatePlugins(self):
         self.activateThis(
-            "PythonPlugins/atmospheric_correction",
             "PythonPlugins/processing_workflow",
-            "PythonPlugins/processing_SWAT",
             "PythonPlugins/openlayers_plugin",
             "PythonPlugins/photo2shape",
             "PythonPlugins/pointsamplingtool",
@@ -841,12 +734,6 @@ class Utilities(QtCore.QObject):
         )
         self.setQGISSettings("Processing/configuration/TAUDEM_FOLDER", taudem)
         self.setQGISSettings("Processing/configuration/MPIEXEC_FOLDER", mpiexec)
-
-    def activateSWATplugin(self, dirPath):
-        self.activateThis(
-            "PythonPlugins/processing_SWAT",
-            "Processing/configuration/ACTIVATE_WG9HM")
-        self.setQGISSettings("Processing/configuration/MAPWINDOW_FOLDER", dirPath)
 
 
 if __name__ == '__main__':
