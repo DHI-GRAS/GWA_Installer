@@ -50,54 +50,29 @@ class Installer():
         res = self.showDialog()
 
         if res == NEXT:
-            # select installation files for 32 or 64 bit install
-            installationsDirs = ['Installations_x32', 'Installations_x64']
-            if os.path.isdir(installationsDirs[0]):
-                is32bit = True
-                installationsDir = installationsDirs[0]
-                _joinbindir = functools.partial(os.path.join, installationsDir)
-                osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-                beamInstall = _joinbindir("beam_5.0_win32_installer.exe")
-                snapInstall = _joinbindir("esa-snap_sentinel_windows_6_0.exe")
-                rInstall = _joinbindir("R-3.3.2-win.exe")
-                taudemInstall = None
-            elif os.path.isdir(installationsDirs[1]):
-                is32bit = False
-                installationsDir = installationsDirs[1]
-                _joinbindir = functools.partial(os.path.join, installationsDir)
-                osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-                beamInstall = " ".join(_joinbindir("beam_5.0_win64_installer.exe"),
-                                       "-q", "-varfile",
-                                       _joinbindir("BEAM_response_install4j.varfile"),
-                                       "-splash", "BEAM installation")
-                snapInstall = " ".join(_joinbindir("esa-snap_sentinel_windows-x64_6_0.exe"),
-                                       "-q", "-varfile",
-                                       _joinbindir("SNAP_response_install4j.varfile"),
-                                       "-splash", "SNAP installation")
-                rInstall = _joinbindir("R-3.3.2-win.exe")
-                taudemInstall = _joinbindir("TauDEM537_setup.exe")
-            else:
-                self.util.error_exit(
-                    'Neither 32 bit nor 64 bit instalations directory exists. '
-                    'Package incomplete.')
-                return
-            # select default installation directories for 32 or 64 bit install
-            if is32bit:
-                install_dirs = {
-                    'OSGeo4W': "C:\\OSGeo4W",
-                    'SNAP': "C:\\Program Files\\SNAP",
-                    'BEAM': "C:\\Program Files\\BEAM-5.0",
-                    'R': "C:\\Program Files\\R\\R-3.3.2",
-                    'TauDEM': None,
-                    'TauDEM/MPI': None}
-            else:
-                install_dirs = {
-                    'OSGeo4W': "C:\\OSGeo4W64",
-                    'SNAP': "C:\\Program Files\\SNAP",
-                    'BEAM': "C:\\Program Files\\BEAM-5.0",
-                    'R': "C:\\Program Files\\R\\R-3.3.2",
-                    'TauDEM': r'C:\Program Files\TauDEM\TauDEM5Exe',
-                    'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin'}
+
+            # select default installation directories for 64 bit install
+            install_dirs = {'OSGeo4W': "C:\\OSGeo4W64",
+                            'SNAP': "C:\\Program Files\\SNAP",
+                            'BEAM': "C:\\Program Files\\BEAM-5.0",
+                            'R': "C:\\Program Files\\R\\R-3.3.2",
+                            'TauDEM': r'C:\Program Files\TauDEM\TauDEM5Exe',
+                            'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin'}
+
+            # select installation files for 64 bit install
+            installationsDir = 'Installations_x64'
+            _joinbindir = functools.partial(os.path.join, installationsDir)
+            osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
+            beamInstall = " ".join(_joinbindir("beam_5.0_win64_installer.exe"),
+                                   "-q", "-varfile",
+                                   _joinbindir("BEAM_response_install4j.varfile"),
+                                   "-splash", "BEAM installation")
+            snapInstall = " ".join(_joinbindir("esa-snap_sentinel_windows-x64_6_0.exe"),
+                                   "-q", "-varfile",
+                                   _joinbindir("SNAP_response_install4j.varfile"),
+                                   "-splash", "SNAP installation")
+            rInstall = _joinbindir("R-3.3.2-win.exe")
+            taudemInstall = _joinbindir("TauDEM537_setup.exe")
 
         elif res == CANCEL:
             del self.dialog
@@ -116,9 +91,8 @@ class Installer():
         ########################################################################
         # Install OSGeo4W (QGIS, OTB, SAGA, GRASS)
 
-        # define RAM fraction to use (SNAP and BEAM)
-        # 32 bit systems usually have less RAM so assign less to BEAM
-        ram_fraction = 0.4 if is32bit else 0.6
+        # Define RAM fraction to use (SNAP and BEAM)
+        ram_fraction = 0.6
 
         self.dialog = GenericInstallWindow('OSGeo4W')
         res = self.showDialog()
@@ -338,10 +312,7 @@ class Installer():
             self.dialog = extractingWaitWindow(
                 self.util, os.path.join(srcPath, "libraries.zip"), dstPath)
             self.showDialog()
-            if is32bit:
-                self.util.activateRplugin(install_dirs['R'], "false")
-            else:
-                self.util.activateRplugin(install_dirs['R'], "true")
+            self.util.activateRplugin(install_dirs['R'], "true")
         elif res == SKIP:
             pass
         elif res == CANCEL:
