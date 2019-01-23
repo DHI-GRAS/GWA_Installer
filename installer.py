@@ -66,8 +66,14 @@ class Installer():
                 installationsDir = installationsDirs[1]
                 _joinbindir = functools.partial(os.path.join, installationsDir)
                 osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-                beamInstall = _joinbindir("beam_5.0_win64_installer.exe")
-                snapInstall = _joinbindir("esa-snap_sentinel_windows-x64_6_0.exe")
+                beamInstall = " ".join(_joinbindir("beam_5.0_win64_installer.exe"),
+                                       "-q", "-varfile",
+                                       _joinbindir("BEAM_response_install4j.varfile"),
+                                       "-splash", "BEAM installation")
+                snapInstall = " ".join(_joinbindir("esa-snap_sentinel_windows-x64_6_0.exe"),
+                                       "-q", "-varfile",
+                                       _joinbindir("SNAP_response_install4j.varfile"),
+                                       "-splash", "SNAP installation")
                 rInstall = _joinbindir("R-3.3.2-win.exe")
                 taudemInstall = _joinbindir("TauDEM537_setup.exe")
             else:
@@ -203,33 +209,26 @@ class Installer():
         # run the BEAM installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(beamInstall)
-            # self.dialog =  beamPostInstallWindow(install_dirs['BEAM']);
-            # res = self.showDialog()
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
 
-        # ask for post-installation even if user has skipped installation
-        self.dialog = DirPathPostInstallWindow('BEAM', install_dirs['BEAM'])
-        res = self.showDialog()
-
-        # copy the additional BEAM modules and set the amount of memory to be used with GPT
-        if res == NEXT:
-            dirPath = install_dirs['BEAM'] = str(self.dialog.dirPathText.toPlainText())
-            dstPath = os.path.join(dirPath, "modules")
+            # Update BEAM modules offline
+            dstPath = os.path.join(install_dirs['BEAM'], "modules")
             srcPath = "BEAM additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
+            beamUpdate = " ".join(os.path.join(install_dirs['BEAM'], "bin", "visat"),
+                                  "--nogui", "--modules", "--update-all")
+            self.util.execSubprocess(beamUpdate)
+
+            # Set the amount of memory to be used with GPT
             try:
                 installer_utils.modifyRamInBatFiles(
-                    os.path.join(dirPath, "bin", 'gpt.bat'), ram_fraction)
+                    os.path.join(install_dirs['BEAM'], "bin", 'gpt.bat'), ram_fraction)
             except IOError as exc:
                 self.util.error_exit(str(exc))
-            self.util.activateBEAMplugin(dirPath)
+
+            # Activate QGIS BEAM plugin
+            self.util.activateBEAMplugin(install_dirs['BEAM'])
+
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -247,40 +246,24 @@ class Installer():
         # run the Snap installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(snapInstall)
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
 
-        # ask for post-installation even if user has skipped installation
-        self.dialog = DirPathPostInstallWindow('SNAP', install_dirs['SNAP'])
-        res = self.showDialog()
+            # Update SNAP modules offline
+            dstPath = install_dirs['SNAP']
+            srcPath = "SNAP additional modules"
+            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
+            self.showDialog()
+            snapUpdate = " ".join(os.path.join(install_dirs['SNAP'], "bin", "snap64"),
+                                  "--nogui", "--modules", "--update-all")
+            self.util.execSubprocess(snapUpdate)
 
-        # Set the amount of memory to be used with NEST GPT
-        if res == NEXT:
-            install_dirs['SNAP'] = str(self.dialog.dirPathText.toPlainText())
+            # Configure snappy
             site_packages_dir = os.path.join(
                 install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
-            # configure snappy
             confbat = os.path.join(install_dirs['SNAP'], 'bin', 'snappy-conf.bat')
             osgeopython = os.path.join(install_dirs['OSGeo4W'], 'bin', 'python.exe')
             cmd = [confbat, osgeopython, site_packages_dir]
             self.dialog = cmdWaitWindow(self.util, cmd, notify=True)
             self.showDialog()
-
-            java_max_mem = installer_utils.get_total_ram() * ram_fraction
-            logger.info('Java max mem: {}'.format(java_max_mem))
-
-            snappy_ini = os.path.join(site_packages_dir, 'snappy', 'snappy.ini')
-            with open(snappy_ini, 'w') as f:
-                f.write(
-                    '[DEFAULT]\n'
-                    'snap_home={}\n'
-                    'java_max_mem={:.0f}m\n'
-                    .format(install_dirs['SNAP'], java_max_mem))
 
             jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
             replace = {
@@ -299,20 +282,22 @@ class Installer():
                 for path in paths:
                     shutil.copy(path, os.path.join(site_packages_dir, 'snappy'))
 
-            # 32 bit systems usually have less RAM so assign less to S1 Toolbox
+            # Set ammount of memory to be used with SNAP
+            java_max_mem = installer_utils.get_total_ram() * ram_fraction
+            logger.info('Java max mem: {}'.format(java_max_mem))
+            snappy_ini = os.path.join(site_packages_dir, 'snappy', 'snappy.ini')
+            with open(snappy_ini, 'w') as f:
+                f.write(
+                    '[DEFAULT]\n'
+                    'snap_home={}\n'
+                    'java_max_mem={:.0f}m\n'
+                    .format(install_dirs['SNAP'], java_max_mem))
             settingsfile = os.path.join(install_dirs['SNAP'], 'bin', 'gpt.vmoptions')
             try:
                 installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)
             except IOError as exc:
                 self.util.error_exit(str(exc))
-            # There is a bug in SNAP installer so the gpt file has to be
-            # modified for 32 bit installation
-            if is32bit:
-                try:
-                    installer_utils.removeIncompatibleJavaOptions(settingsfile)
-                except IOError as exc:
-                    self.error_exit(str(exc))
-            self.util.activateSNAPplugin(install_dirs['SNAP'])
+
         elif res == SKIP:
             pass
         elif res == CANCEL:
