@@ -63,12 +63,12 @@ class Installer():
             installationsDir = 'Installations_x64'
             _joinbindir = functools.partial(os.path.join, installationsDir)
             osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-            beamInstall = " ".join([_joinbindir("beam_5.0_win64_installer.exe"), "-q",
-                                    "-varfile", _joinbindir("BEAM_response_install4j.varfile"),
-                                    "-splash", "BEAM installation"])
-            snapInstall = " ".join([_joinbindir("esa-snap_sentinel_windows-x64_6_0.exe"), "-q",
-                                    "-varfile", _joinbindir("SNAP_response_install4j.varfile"),
-                                    "-splash", "SNAP installation"])
+            beamInstall = [_joinbindir('beam_5.0_win64_installer.exe'), '-q',
+                           '-varfile', 'BEAM_response_install4j.varfile',
+                           '-splash', '"BEAM installation"']
+            snapInstall = [_joinbindir('esa-snap_sentinel_windows-x64_6_0.exe'), '-q',
+                           '-varfile', 'SNAP_response_install4j.varfile',
+                           '-splash', '"SNAP installation"']
             rInstall = _joinbindir("R-3.3.2-win.exe")
             taudemInstall = _joinbindir("TauDEM537_setup.exe")
 
@@ -187,8 +187,8 @@ class Installer():
             srcPath = "BEAM additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
-            beamUpdate = " ".join([os.path.join(install_dirs['BEAM'], "bin", "visat"),
-                                   "--nogui", "--modules", "--update-all"])
+            beamUpdate = [os.path.join(install_dirs['BEAM'], "bin", "visat.exe"),
+                          "--nogui", "--modules", "--update-all"]
             self.util.execSubprocess(beamUpdate)
 
             # Set the amount of memory to be used with GPT
@@ -224,8 +224,8 @@ class Installer():
             srcPath = "SNAP additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
-            snapUpdate = " ".join([os.path.join(install_dirs['SNAP'], "bin", "snap64"),
-                                   "--nogui", "--modules", "--update-all"])
+            snapUpdate = [os.path.join(install_dirs['SNAP'], "bin", "snap64.exe"),
+                          "--nogui", "--modules", "--update-all"]
             self.util.execSubprocess(snapUpdate)
 
             # Configure snappy
@@ -258,18 +258,20 @@ class Installer():
             java_max_mem = installer_utils.get_total_ram() * ram_fraction
             logger.info('Java max mem: {}'.format(java_max_mem))
             snappy_ini = os.path.join(site_packages_dir, 'snappy', 'snappy.ini')
-            with open(snappy_ini, 'w') as f:
-                f.write(
-                    '[DEFAULT]\n'
-                    'snap_home={}\n'
-                    'java_max_mem={:.0f}m\n'
-                    .format(install_dirs['SNAP'], java_max_mem))
+            try:
+                with open(snappy_ini, 'w') as f:
+                    f.write(
+                        '[DEFAULT]\n'
+                        'snap_home={}\n'
+                        'java_max_mem={:.0f}m\n'
+                        .format(install_dirs['SNAP'], java_max_mem))
+            except IOError:
+                logger.warn('Could not find snappy.ini to set max memory')
             settingsfile = os.path.join(install_dirs['SNAP'], 'bin', 'gpt.vmoptions')
             try:
                 installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)
             except IOError as exc:
                 self.util.error_exit(str(exc))
-
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -403,8 +405,12 @@ class Utilities(QtCore.QObject):
 
     def execSubprocess(self, command):
         logger.info('Running binary installer: %s', command)
-        # command should be a path to an exe file so check if it exists
-        if not os.path.isfile(command):
+        # First part of a command should be a path to an exe file so check if it exists
+        if type(command) is list:
+            c = command[0]
+        else:
+            c = command
+        if not os.path.isfile(c):
             msgBox = QtGui.QMessageBox()
             msgBox.setText(
                 "Could not find the installation file for this component!\n\n "

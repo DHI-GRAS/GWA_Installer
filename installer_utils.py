@@ -102,10 +102,10 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
                         continue
                     outfile.write(line)
                 outfile.write(ram_flag)
-        except:
+        except IOError:
             shutil.move(backupfile, batFilePath)
             logger.exception()
-            raise
+            raise IOError("Cannot change settings in " + batFilePath)
 
 
 def removeIncompatibleJavaOptions(self, batFilePath):
