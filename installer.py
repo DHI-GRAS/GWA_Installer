@@ -272,6 +272,16 @@ class Installer():
                 installer_utils.modifyRamInBatFiles(settingsfile, ram_fraction)
             except IOError as exc:
                 self.util.error_exit(str(exc))
+
+            # Enable per-pixel-geocoding for OLCI and MERIS
+            try:
+                with open(os.path.join(os.path.expanduser("~"), ".snap", "etc", "s3tbx.properties"),
+                          "a") as fp:
+                    fp.write("s3tbx.reader.olci.pixelGeoCoding=true\n")
+                    fp.write("s3tbx.reader.meris.pixelGeoCoding=true\n")
+            except IOError:
+                logger.warn('Could not set options in s3tbx.properties.')
+
         elif res == SKIP:
             pass
         elif res == CANCEL:
