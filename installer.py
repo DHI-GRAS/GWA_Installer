@@ -63,14 +63,12 @@ class Installer():
             installationsDir = 'Installations_x64'
             _joinbindir = functools.partial(os.path.join, installationsDir)
             osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-            beamInstall = " ".join(_joinbindir("beam_5.0_win64_installer.exe"),
-                                   "-q", "-varfile",
-                                   _joinbindir("BEAM_response_install4j.varfile"),
-                                   "-splash", "BEAM installation")
-            snapInstall = " ".join(_joinbindir("esa-snap_sentinel_windows-x64_6_0.exe"),
-                                   "-q", "-varfile",
-                                   _joinbindir("SNAP_response_install4j.varfile"),
-                                   "-splash", "SNAP installation")
+            beamInstall = " ".join([_joinbindir("beam_5.0_win64_installer.exe"), "-q",
+                                    "-varfile", _joinbindir("BEAM_response_install4j.varfile"),
+                                    "-splash", "BEAM installation"])
+            snapInstall = " ".join([_joinbindir("esa-snap_sentinel_windows-x64_6_0.exe"), "-q",
+                                    "-varfile", _joinbindir("SNAP_response_install4j.varfile"),
+                                    "-splash", "SNAP installation"])
             rInstall = _joinbindir("R-3.3.2-win.exe")
             taudemInstall = _joinbindir("TauDEM537_setup.exe")
 
@@ -189,8 +187,8 @@ class Installer():
             srcPath = "BEAM additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
-            beamUpdate = " ".join(os.path.join(install_dirs['BEAM'], "bin", "visat"),
-                                  "--nogui", "--modules", "--update-all")
+            beamUpdate = " ".join([os.path.join(install_dirs['BEAM'], "bin", "visat"),
+                                   "--nogui", "--modules", "--update-all"])
             self.util.execSubprocess(beamUpdate)
 
             # Set the amount of memory to be used with GPT
@@ -226,8 +224,8 @@ class Installer():
             srcPath = "SNAP additional modules"
             self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
             self.showDialog()
-            snapUpdate = " ".join(os.path.join(install_dirs['SNAP'], "bin", "snap64"),
-                                  "--nogui", "--modules", "--update-all")
+            snapUpdate = " ".join([os.path.join(install_dirs['SNAP'], "bin", "snap64"),
+                                   "--nogui", "--modules", "--update-all"])
             self.util.execSubprocess(snapUpdate)
 
             # Configure snappy
