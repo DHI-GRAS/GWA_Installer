@@ -56,7 +56,7 @@ class Installer():
                             'SNAP': "C:\\Program Files\\SNAP",
                             'BEAM': "C:\\Program Files\\BEAM-5.0",
                             'R': "C:\\Program Files\\R\\R-3.3.2",
-                            'TauDEM': r'C:\Program Files\TauDEM\TauDEM5Exe',
+                            'TauDEM': r'C:\OSGeo4W64\apps\TauDEM5Exe',
                             'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin'}
 
             # select installation files for 64 bit install
@@ -70,7 +70,8 @@ class Installer():
                            '-varfile', 'SNAP_response_install4j.varfile',
                            '-splash', '"SNAP installation"']
             rInstall = _joinbindir("R-3.3.2-win.exe")
-            taudemInstall = _joinbindir("TauDEM537_setup.exe")
+            taudemInstall = _joinbindir("TauDEM5Exe.zip")
+            taudemMpiInstall = _joinbindir("msmpisetup.exe")
 
         elif res == CANCEL:
             del self.dialog
@@ -338,19 +339,10 @@ class Installer():
         res = self.showDialog()
         if res == NEXT:
             # TauDEM
-            self.util.execSubprocess(taudemInstall)
-            self.dialog = DirPathPostInstallWindow('TauDEM', install_dirs['TauDEM'])
-            res = self.showDialog()
-            if res == NEXT:
-                install_dirs['TauDEM'] = str(self.dialog.dirPathText.toPlainText())
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
+            self.dialog = extractingWaitWindow(self.util, taudemInstall, install_dirs["TauDEM"])
+            self.showDialog()
             # MPI
+            self.util.execSubprocess(taudemMpiInstall)
             self.dialog = DirPathPostInstallWindow('TauDEM/MPI', install_dirs['TauDEM/MPI'])
             res = self.showDialog()
             if res == NEXT:
