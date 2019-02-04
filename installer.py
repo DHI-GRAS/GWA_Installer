@@ -317,12 +317,6 @@ class Installer():
         # Copy the R additional libraries
         if res == NEXT:
             install_dirs['R'] = str(self.dialog.dirPathText.toPlainText())
-            dstPath = os.path.join(install_dirs['R'], "library")
-            srcPath = "R additional libraries"
-            # show dialog because it might take some time on slower computers
-            self.dialog = extractingWaitWindow(
-                self.util, os.path.join(srcPath, "libraries.zip"), dstPath)
-            self.showDialog()
             self.util.activateRplugin(install_dirs['R'], "true")
         elif res == SKIP:
             pass
