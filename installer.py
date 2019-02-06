@@ -220,15 +220,6 @@ class Installer():
         if res == NEXT:
             self.util.execSubprocess(snapInstall)
 
-            # Update SNAP modules offline
-            dstPath = install_dirs['SNAP']
-            srcPath = "SNAP additional modules"
-            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
-            self.showDialog()
-            snapUpdate = [os.path.join(install_dirs['SNAP'], "bin", "snap64.exe"),
-                          "--nogui", "--modules", "--update-all"]
-            self.util.execSubprocess(snapUpdate)
-
             # Configure snappy
             site_packages_dir = os.path.join(
                 install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
@@ -282,6 +273,18 @@ class Installer():
                     fp.write("s3tbx.reader.meris.pixelGeoCoding=true\n")
             except IOError:
                 logger.warn('Could not set options in s3tbx.properties.')
+
+            # Update SNAP modules offline
+            dstPath = install_dirs['SNAP']
+            srcPath = "SNAP additional modules"
+            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
+            self.showDialog()
+            snapUpdate = [os.path.join(install_dirs['SNAP'], "bin", "snap64.exe"),
+                          "--nogui", "--modules", "--update-all"]
+            self.util.execSubprocess(snapUpdate)
+
+            # Activate QGIS SNAP plugin
+            self.util.activateSNAPplugin(install_dirs['SNAP'])
 
         elif res == SKIP:
             pass
