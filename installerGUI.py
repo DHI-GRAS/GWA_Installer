@@ -79,14 +79,13 @@ INSTALL_INSTRUCTIONS = {
         "The process should be automatic but if any question dialogs pop-up just click OK."),
     'BEAM': (
         "After clicking on the \"Install\" button the BEAM installer will start. "
-        "In the installer you will be asked to accept the BEAM license conditions "
-        "followed by a couple of installation questions. In all the questions you "
-        "can keep the default answers by clicking \"Next >\" until the installation starts."),
+        "BEAM is licensed under GNU General Public Lincense version 3 (GPLv3) and by starting the "
+        "installation you accept the lincese condition. The installation is fully automatic."),
     "SNAP": (
         "After clicking on the \"Install\" button the Snap Toolbox installer will start. "
-        "In the installer you will be asked to accept the Snap Toolbox license conditions "
-        "followed by a couple of installation questions. In all the questions you can keep "
-        "the default answers by clicking \"Next >\" until the installation starts."),
+        "SNAP is licensed under GNU General Public Lincense version 3 (GPLv3) and by starting the "
+        "installation you accept the lincese condition. The installation is fully automatic and "
+        "may take some time to complete."),
     'R': (
         "After clicking on the \"Install\" button the R installer will start. "
         "In the installer you will be asked to accept the R license conditions "
@@ -95,9 +94,10 @@ INSTALL_INSTRUCTIONS = {
         "installation starts."),
     'TauDEM': (
         "After clicking on the \"Install\" button the TauDEM installer will start. "
-        "It will install several components. In the GDAL installation, choose \"Typical\". "
-        "If you change the TauDEM or MPI default directories, you must enter these in the "
-        "following post-installation steps.")
+        "TauDEM is licensed under GNU General Public Lincense version 3 (GPLv3) and by starting the "
+        "installation you accept the lincese condition. The installation is mostly automatic, "
+        "except for Microsoft MPI for which you will have to follow instruction in its "
+        "installation dialog.")
 }
 
 LOGOS = {
