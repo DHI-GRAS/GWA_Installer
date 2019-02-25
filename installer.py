@@ -223,11 +223,9 @@ class Installer():
             # Configure snappy
             site_packages_dir = os.path.join(
                 install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
-            confbat = os.path.join(install_dirs['SNAP'], 'bin', 'snappy-conf.bat')
             osgeopython = os.path.join(install_dirs['OSGeo4W'], 'bin', 'python-qgis-ltr.bat')
-            cmd = [confbat, osgeopython, site_packages_dir]
-            self.dialog = cmdWaitWindow(self.util, cmd, notify=True)
-            self.showDialog()
+            self.util.execSubprocess([os.path.join(install_dirs['SNAP'], "bin", "snap64.exe"),
+                                     "--nogui", "--python", osgeopython, site_packages_dir])
 
             jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
             replace = {
