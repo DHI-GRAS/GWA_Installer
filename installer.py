@@ -54,24 +54,16 @@ class Installer():
             # select default installation directories for 64 bit install
             install_dirs = {'OSGeo4W': "C:\\OSGeo4W64",
                             'SNAP': "C:\\Program Files\\SNAP",
-                            'BEAM': "C:\\Program Files\\BEAM-5.0",
-                            'R': "C:\\Program Files\\R\\R-3.3.2",
-                            'TauDEM': r'C:\OSGeo4W64\apps\TauDEM5Exe',
-                            'TauDEM/MPI': r'C:\Program Files\Microsoft MPI\Bin'}
+                            'R': "C:\\Program Files\\R\\R-4.0.2"}
 
             # select installation files for 64 bit install
             installationsDir = 'Installations_x64'
             _joinbindir = functools.partial(os.path.join, installationsDir)
             osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-            beamInstall = [_joinbindir('beam_5.0_win64_installer.exe'), '-q',
-                           '-varfile', 'BEAM_response_install4j.varfile',
-                           '-splash', '"BEAM installation"']
-            snapInstall = [_joinbindir('esa-snap_sentinel_windows-x64_6_0.exe'), '-q',
+            snapInstall = [_joinbindir('esa-snap_sentinel_windows-x64_7_0.exe'), '-q',
                            '-varfile', 'SNAP_response_install4j.varfile',
                            '-splash', '"SNAP installation"']
-            rInstall = _joinbindir("R-3.3.2-win.exe")
-            taudemInstall = _joinbindir("TauDEM5Exe.zip")
-            taudemMpiInstall = _joinbindir("msmpisetup.exe")
+            rInstall = _joinbindir("R-4.0.2-win.exe")
 
         elif res == CANCEL:
             del self.dialog
@@ -88,7 +80,7 @@ class Installer():
             return
 
         ########################################################################
-        # Install OSGeo4W (QGIS, OTB, SAGA, GRASS)
+        # Install OSGeo4W (QGIS, SAGA, GRASS)
 
         # Define RAM fraction to use (SNAP and BEAM)
         ram_fraction = 0.6
@@ -114,10 +106,12 @@ class Installer():
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
             install_dirs['OSGeo4W'] = str(self.dialog.dirPathText.toPlainText())
+            qgis_profile_path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "QGIS"
+                                             "QGIS3", "profiles", "default")
 
             QGIS_extras_dir = os.path.abspath("QGIS additional software")
             # copy the plugins
-            dstPath = os.path.join(os.path.expanduser("~"), ".qgis2", "python", 'plugins')
+            dstPath = os.path.join(qgis_profile_path, "python", "plugins")
             srcPath = os.path.join(QGIS_extras_dir, "plugins", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
@@ -137,7 +131,7 @@ class Installer():
             self.showDialog()
 
             # copy scripts and models
-            processing_dir = os.path.join(os.path.expanduser("~"), ".qgis2", "processing")
+            processing_dir = os.path.join(qgis_profile_path, "processing")
             processing_packages = glob.glob(os.path.join(QGIS_extras_dir, '*.zip'))
             logger.info('Found processing packages: %s', processing_packages)
             for zipfname in processing_packages:
@@ -147,7 +141,7 @@ class Installer():
 
             # copy additional python packages
             site_packages_dir = os.path.join(
-                install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
+                install_dirs['OSGeo4W'], 'apps', 'Python37', 'Lib', 'site-packages')
             python_packages = glob.glob(os.path.join(QGIS_extras_dir, 'python_packages', '*.zip'))
             logger.info('Found python packages: %s', python_packages)
             for zipfname in python_packages:
@@ -173,42 +167,6 @@ class Installer():
         else:
             self.unknownActionPopup()
 
-        # #######################################################################
-        # Install BEAM
-
-        self.dialog = GenericInstallWindow('BEAM')
-        res = self.showDialog()
-
-        # run the BEAM installation here as an outside process
-        if res == NEXT:
-            self.util.execSubprocess(beamInstall)
-
-            # Update BEAM modules offline
-            dstPath = os.path.join(install_dirs['BEAM'], "modules")
-            srcPath = "BEAM additional modules"
-            self.dialog = copyingWaitWindow(self.util, srcPath, dstPath)
-            self.showDialog()
-            beamUpdate = [os.path.join(install_dirs['BEAM'], "bin", "visat.exe"),
-                          "--nogui", "--modules", "--update-all"]
-            self.util.execSubprocess(beamUpdate)
-
-            # Set the amount of memory to be used with GPT
-            try:
-                installer_utils.modifyRamInBatFiles(
-                    os.path.join(install_dirs['BEAM'], "bin", 'gpt.bat'), ram_fraction)
-            except IOError as exc:
-                self.util.error_exit(str(exc))
-
-            # Activate QGIS BEAM plugin
-            self.util.activateBEAMplugin(install_dirs['BEAM'])
-
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
 
         ########################################################################
         # Install Snap Toolbox
@@ -222,7 +180,7 @@ class Installer():
 
             # Configure snappy
             site_packages_dir = os.path.join(
-                install_dirs['OSGeo4W'], 'apps', 'Python27', 'Lib', 'site-packages')
+                install_dirs['OSGeo4W'], 'apps', 'Python37', 'Lib', 'site-packages')
             osgeopython = os.path.join(install_dirs['OSGeo4W'], 'bin', 'python-qgis-ltr.bat')
             self.util.execSubprocess([os.path.join(install_dirs['SNAP'], "bin", "snap64.exe"),
                                      "--nogui", "--python", osgeopython, site_packages_dir])
@@ -327,52 +285,6 @@ class Installer():
         else:
             self.unknownActionPopup()
 
-        ########################################################################
-        # Install TauDEM
-
-        self.dialog = GenericInstallWindow('TauDEM')
-        res = self.showDialog()
-        if res == NEXT:
-            # TauDEM
-            self.dialog = extractingWaitWindow(self.util, taudemInstall, install_dirs["TauDEM"])
-            self.showDialog()
-            # MPI
-            self.util.execSubprocess(taudemMpiInstall)
-            self.dialog = DirPathPostInstallWindow('TauDEM/MPI', install_dirs['TauDEM/MPI'])
-            res = self.showDialog()
-            if res == NEXT:
-                install_dirs['TauDEM/MPI'] = str(self.dialog.dirPathText.toPlainText())
-            elif res == SKIP:
-                pass
-            elif res == CANCEL:
-                del self.dialog
-                return
-            else:
-                self.unknownActionPopup()
-            self.util.activateTaudem(install_dirs['TauDEM'], install_dirs['TauDEM/MPI'])
-        elif res == SKIP:
-            pass
-        elif res == CANCEL:
-            del self.dialog
-            return
-        else:
-            self.unknownActionPopup()
-
-        # Finish
-        self.dialog = finishWindow()
-        self.showDialog()
-        del self.dialog
-
-    def showDialog(self):
-        return(self.dialog.exec_())
-
-    def unknownActionPopup(self):
-        msgBox = QtGui.QMessageBox()
-        msgBox.setText(
-            "Unknown action chosen in the previous installation step. "
-            "Ask the developer to check the installation script!\n\n Quitting installation")
-        msgBox.exec_()
-
 
 ##########################################
 # helper functions
@@ -443,14 +355,6 @@ class Utilities(QtCore.QObject):
             self._log_traceback(notify=notify)
         finally:
             self.finished.emit()
-
-    def cmd_install_msi(self, msipath):
-        logfname = os.path.splitext(os.path.basename(msipath))[0] + '_gwa_install.log'
-        logpath = os.path.join(tempfile.gettempdir(), logfname)
-        logger.info('Installing MSI %s and logging to %s', msipath, logpath)
-        cmd = 'msiexec /passive /norestart /i {msipath} /log {logpath}'.format(msipath, logpath)
-        kwargs = dict(shell=True, notify=True)
-        return cmd, kwargs
 
     def cmd_install_pip_offline(self, osgeo_root, package_dir):
         requirements_file = os.path.join(package_dir, 'requirements.txt')
@@ -625,12 +529,6 @@ class Utilities(QtCore.QObject):
         except (IndexError, OSError):
             pass
 
-    def activateBEAMplugin(self, dirPath):
-        self.activateThis(
-            "PythonPlugins/processing_gpf",
-            "Processing/configuration/ACTIVATE_BEAM")
-        self.setQGISSettings("Processing/configuration/BEAM_FOLDER", dirPath)
-
     def activateSNAPplugin(self, dirPath):
         self.activateThis(
             "PythonPlugins/processing_gpf",
@@ -645,14 +543,6 @@ class Utilities(QtCore.QObject):
             "Processing/configuration/ACTIVATE_R")
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
-
-    def activateTaudem(self, taudem, mpiexec):
-        self.activateThis(
-            "Processing/configuration/ACTIVATE_TAUDEM",
-            "Processing/configuration/TAUDEM_USE_SINGLEFILE",
-        )
-        self.setQGISSettings("Processing/configuration/TAUDEM_FOLDER", taudem)
-        self.setQGISSettings("Processing/configuration/MPIEXEC_FOLDER", mpiexec)
 
 
 if __name__ == '__main__':

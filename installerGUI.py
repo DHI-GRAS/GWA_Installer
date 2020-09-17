@@ -61,15 +61,9 @@ DESCRIPTIONS = {
     'SNAP': (
         "Snap Toolbox is a software for analyzing data derived with satellites operated "
         "by European Space Agency (ESA) and other organisations."),
-    'BEAM': (
-        "BEAM is a software for analyzing optical and thermal data derived with "
-        "satellites operated by European Space Agency (ESA) and other organisation."),
     'R': (
         "R is a statistical scripting language used by GWA Toolbox for various "
-        "data processing tasks."),
-    'TauDEM': (
-        "TauDEM (Terrain Analysis Using Digital Elevation Models) "
-        "is used to extract and analyse hydrologic information from topography.")
+        "data processing tasks.")
 }
 DESCRIPTIONS['TauDEM/MPI'] = DESCRIPTIONS['TauDEM']
 
@@ -77,10 +71,6 @@ INSTALL_INSTRUCTIONS = {
     'OSGeo4W': (
         "After clicking on the \"Install\" button the OSGeo4W installer will start. "
         "The process should be automatic but if any question dialogs pop-up just click OK."),
-    'BEAM': (
-        "After clicking on the \"Install\" button the BEAM installer will start. "
-        "BEAM is licensed under GNU General Public Lincense version 3 (GPLv3) and by starting the "
-        "installation you accept the lincese condition. The installation is fully automatic."),
     "SNAP": (
         "After clicking on the \"Install\" button the Snap Toolbox installer will start. "
         "SNAP is licensed under GNU General Public Lincense version 3 (GPLv3) and by starting the "
@@ -92,24 +82,15 @@ INSTALL_INSTRUCTIONS = {
         "followed by a couple of installation questions. In all the questions "
         "you can keep the default answers by clicking \"Next >\" until the "
         "installation starts."),
-    'TauDEM': (
-        "After clicking on the \"Install\" button the TauDEM installer will start. "
-        "TauDEM is licensed under GNU General Public Lincense version 3 (GPLv3) and by starting the "
-        "installation you accept the lincese condition. The installation is mostly automatic, "
-        "except for Microsoft MPI for which you will have to follow instruction in its "
-        "installation dialog.")
 }
 
 LOGOS = {
     'main': 'images/GWA_logo.png',
     'main_ico': "images/GWA.ico",
     'OSGeo4W': "images/osgeo4wLogo.png",
-    'BEAM': "images/beamLogo.png",
     'SNAP': "images/snapLogo.png",
     'R': "images/rLogo.png",
-    'TauDEM': "images/taudem_logo.png",
 }
-LOGOS['TauDEM/MPI'] = LOGOS['TauDEM']
 
 
 UNINSTALL_LABEL = (
