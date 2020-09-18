@@ -7,7 +7,7 @@ import ctypes
 import ctypes.wintypes
 import logging
 
-from PyQt4 import QtGui
+from PyQt5 import QtWidgets
 
 logger = logging.getLogger('gwa_installer')
 
@@ -15,7 +15,7 @@ logger = logging.getLogger('gwa_installer')
 def get_total_ram():
     """Get amount of physical memory"""
     if sys.platform != 'win32':
-        msgBox = QtGui.QMessageBox()
+        msgBox = QtWidgets.QMessageBox()
         msgBox.setText(
             "This installer is only meant for Windows!\n\n "
             "The installed GWA Toolbox might not work properly.")
@@ -52,7 +52,7 @@ def modifyRamInBatFiles(batFilePath, useRamFraction):
 
     # Make sure the BEAM/SNAP batch file exists in the given directory
     if not os.path.isfile(batFilePath):
-        msgBox = QtGui.QMessageBox()
+        msgBox = QtWidgets.QMessageBox()
         msgBox.setText(
             "Could not find the batch file!\n\n "
             "The amount of RAM available to the program was not changed.")
@@ -154,7 +154,7 @@ def fix_jpyconfig(path, replace):
 
 def check_file_exists(filepath):
     if not os.path.isfile(filepath):
-        msgBox = QtGui.QMessageBox()
+        msgBox = QtWidgets.QMessageBox()
         msgBox.setText(
             "Could not find the required file \'{}\'.\n\n "
             "Skipping this step.".format(filepath))

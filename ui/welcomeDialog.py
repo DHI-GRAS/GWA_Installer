@@ -1,79 +1,63 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\welcomeDialog.ui'
+# Form implementation generated from reading ui file 'welcomeDialog.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
+        Dialog.setObjectName("Dialog")
         Dialog.resize(570, 464)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("../GWA.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../GWA.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Dialog.setWindowIcon(icon)
-        self.logoLabel = QtGui.QLabel(Dialog)
+        self.logoLabel = QtWidgets.QLabel(Dialog)
         self.logoLabel.setGeometry(QtCore.QRect(420, 50, 131, 51))
-        self.logoLabel.setText(_fromUtf8(""))
-        self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8("../images/GWA_logo.png")))
+        self.logoLabel.setText("")
+        self.logoLabel.setPixmap(QtGui.QPixmap("../images/GWA_logo.png"))
         self.logoLabel.setScaledContents(True)
-        self.logoLabel.setObjectName(_fromUtf8("logoLabel"))
-        self.osLabel = QtGui.QLabel(Dialog)
-        self.osLabel.setGeometry(QtCore.QRect(20, 150, 251, 16))
-        self.osLabel.setObjectName(_fromUtf8("osLabel"))
-        self.licenseLabel = QtGui.QLabel(Dialog)
+        self.logoLabel.setObjectName("logoLabel")
+        self.licenseLabel = QtWidgets.QLabel(Dialog)
         self.licenseLabel.setGeometry(QtCore.QRect(20, 190, 531, 41))
         self.licenseLabel.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedKingdom))
         self.licenseLabel.setWordWrap(True)
-        self.licenseLabel.setObjectName(_fromUtf8("licenseLabel"))
-        self.cancelButton = QtGui.QPushButton(Dialog)
+        self.licenseLabel.setObjectName("licenseLabel")
+        self.cancelButton = QtWidgets.QPushButton(Dialog)
         self.cancelButton.setGeometry(QtCore.QRect(470, 410, 75, 23))
-        self.cancelButton.setObjectName(_fromUtf8("cancelButton"))
-        self.licenseTextBrowser = QtGui.QTextBrowser(Dialog)
+        self.cancelButton.setObjectName("cancelButton")
+        self.licenseTextBrowser = QtWidgets.QTextBrowser(Dialog)
         self.licenseTextBrowser.setGeometry(QtCore.QRect(20, 240, 531, 151))
-        self.licenseTextBrowser.setObjectName(_fromUtf8("licenseTextBrowser"))
-        self.topLabel2 = QtGui.QLabel(Dialog)
+        self.licenseTextBrowser.setObjectName("licenseTextBrowser")
+        self.topLabel2 = QtWidgets.QLabel(Dialog)
         self.topLabel2.setGeometry(QtCore.QRect(20, 80, 371, 41))
         self.topLabel2.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedKingdom))
         self.topLabel2.setWordWrap(True)
-        self.topLabel2.setObjectName(_fromUtf8("topLabel2"))
-        self.beginButton = QtGui.QPushButton(Dialog)
+        self.topLabel2.setObjectName("topLabel2")
+        self.beginButton = QtWidgets.QPushButton(Dialog)
         self.beginButton.setGeometry(QtCore.QRect(380, 410, 75, 23))
-        self.beginButton.setObjectName(_fromUtf8("beginButton"))
-        self.topLabel1 = QtGui.QLabel(Dialog)
+        self.beginButton.setObjectName("beginButton")
+        self.topLabel1 = QtWidgets.QLabel(Dialog)
         self.topLabel1.setGeometry(QtCore.QRect(20, 30, 401, 41))
         self.topLabel1.setWordWrap(True)
-        self.topLabel1.setObjectName(_fromUtf8("topLabel1"))
-        self.line = QtGui.QFrame(Dialog)
+        self.topLabel1.setObjectName("topLabel1")
+        self.line = QtWidgets.QFrame(Dialog)
         self.line.setGeometry(QtCore.QRect(20, 130, 531, 16))
-        self.line.setFrameShape(QtGui.QFrame.HLine)
-        self.line.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line.setObjectName(_fromUtf8("line"))
+        self.line.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation", None))
-        self.licenseLabel.setText(_translate("Dialog", "By beginning the installation you accept the license conditions for the GlobWetland Africa developed software, stated below. The other GWA Toolbox components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source.", None))
-        self.cancelButton.setText(_translate("Dialog", "Cancel", None))
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "GWA Toolbox Installation"))
+        self.licenseLabel.setText(_translate("Dialog", "By beginning the installation you accept the license conditions for the GlobWetland Africa developed software, stated below. The other GWA Toolbox components might come with different license agreements which you will have to accept during the installation process. However, they are all classified as open-source."))
+        self.cancelButton.setText(_translate("Dialog", "Cancel"))
         self.licenseTextBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -215,8 +199,8 @@ class Ui_Dialog(object):
 "<p style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Courier New,courier\'; font-size:8pt;\">    under certain conditions; type `show c\' for details. </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The hypothetical commands `show w\' and `show c\' should show the appropriate parts of the General Public License. Of course, your program\'s commands might be different; for a GUI interface, you would use an “about box”. </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">You should also get your employer (if you work as a programmer) or school, if any, to sign a “copyright disclaimer” for the program, if necessary. For more information on this, and how to apply and follow the GNU GPL, see &lt;http://www.gnu.org/licenses/&gt;. </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The GNU General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. But first, please read &lt;http://www.gnu.org/philosophy/why-not-lgpl.html&gt;. </span></p></body></html>", None))
-        self.topLabel2.setText(_translate("Dialog", "GWA Toolbox is an easy to use, open-source toolkit designed to facilitate wetland inventory, assessment and monitoring with the help of Earth observation data. It was developed during the GlobWetland Africa project.", None))
-        self.beginButton.setText(_translate("Dialog", "Begin", None))
-        self.topLabel1.setText(_translate("Dialog", "Welcome to the GlobWetland Africa (GWA) Toolbox installation program, which will guide you through the installation of the GWA Toolbox components.", None))
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The GNU General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. But first, please read &lt;http://www.gnu.org/philosophy/why-not-lgpl.html&gt;. </span></p></body></html>"))
+        self.topLabel2.setText(_translate("Dialog", "GWA Toolbox is an easy to use, open-source toolkit designed to facilitate wetland inventory, assessment and monitoring with the help of Earth observation data. It was developed during the GlobWetland Africa project."))
+        self.beginButton.setText(_translate("Dialog", "Begin"))
+        self.topLabel1.setText(_translate("Dialog", "Welcome to the GlobWetland Africa (GWA) Toolbox installation program, which will guide you through the installation of the GWA Toolbox components."))
 

@@ -25,7 +25,7 @@
 """
 import os
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from ui import welcomeDialog, installComponentDialog
 from ui import postInstallComponentDialog, componentInstructionsDialog
 
@@ -37,18 +37,18 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
 
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 # CONSTANTS
-CANCEL = QtGui.QDialog.Rejected
-NEXT = QtGui.QDialog.Accepted
-SKIP = QtGui.QDialog.Accepted + 1
+CANCEL = QtWidgets.QDialog.Rejected
+NEXT = QtWidgets.QDialog.Accepted
+SKIP = QtWidgets.QDialog.Accepted + 1
 
 WINDOW_TITLE = "GWA Toolbox Installation - Install {name}"
 
@@ -65,7 +65,6 @@ DESCRIPTIONS = {
         "R is a statistical scripting language used by GWA Toolbox for various "
         "data processing tasks.")
 }
-DESCRIPTIONS['TauDEM/MPI'] = DESCRIPTIONS['TauDEM']
 
 INSTALL_INSTRUCTIONS = {
     'OSGeo4W': (
@@ -177,7 +176,7 @@ class postInstallWindow(installerBaseWindow, postInstallComponentDialog.Ui_Dialo
         self.continueButton.setFocus()
 
     def dirSelection(self):
-        path = QtGui.QFileDialog.getExistingDirectory(directory=self.dirPathText.toPlainText())
+        path = QtWidgets.QFileDialog.getExistingDirectory(directory=self.dirPathText.toPlainText())
         if not path.isNull():
             self.dirPathText.setPlainText(_translate("MainWindow", path, None))
 
@@ -396,7 +395,7 @@ class copyingWaitWindow(instructionsWindow, QtCore.QObject):
         self.MainWindow.close()
 
 
-class myQDialog(QtGui.QDialog):
+class myQDialog(QtWidgets.QDialog):
     """Reimplement QDialog to start a given thread shortly after the dialog is displayed"""
 
     def __init__(self, workerThread):

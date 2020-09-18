@@ -12,7 +12,7 @@ import logging
 from zipfile import ZipFile
 from distutils import dir_util
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 from installerGUI import installerWelcomeWindow
 from installerGUI import GenericInstallWindow, DirPathPostInstallWindow
 from installerGUI import extractingWaitWindow, copyingWaitWindow
@@ -306,7 +306,7 @@ class Utilities(QtCore.QObject):
             raise
         elif notify:
             trace = traceback.format_exc()
-            msgBox = QtGui.QMessageBox()
+            msgBox = QtWidgets.QMessageBox()
             msgBox.setText(
                 "An error occurred: {}. Log written to \'{}\'."
                 .format(trace, self.logfile))
@@ -320,7 +320,7 @@ class Utilities(QtCore.QObject):
         else:
             c = command
         if not os.path.isfile(c):
-            msgBox = QtGui.QMessageBox()
+            msgBox = QtWidgets.QMessageBox()
             msgBox.setText(
                 "Could not find the installation file for this component!\n\n "
                 "Skipping to next component")
@@ -394,7 +394,7 @@ class Utilities(QtCore.QObject):
 
     def error_exit(self, msg):
         logger.error(msg)
-        msgBox = QtGui.QMessageBox()
+        msgBox = QtWidgets.QMessageBox()
         msgBox.setText(msg)
         msgBox.exec_()
         self.finished.emit()
@@ -430,7 +430,7 @@ class Utilities(QtCore.QObject):
         else:
             msg = "Cannot find the source directory!\n\n No files were copied."
             logger.error(msg)
-            msgBox = QtGui.QMessageBox()
+            msgBox = QtWidgets.QMessageBox()
             msgBox.setText(msg)
             msgBox.exec_()
 
@@ -550,7 +550,7 @@ if __name__ == '__main__':
     logfile = _set_logfile_handler()
 
     try:
-        app = QtGui.QApplication(sys.argv)
+        app = QtWidgets.QApplication(sys.argv)
 
         installer = Installer(logfile=logfile)
 
