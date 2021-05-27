@@ -54,16 +54,16 @@ class Installer():
             # select default installation directories for 64 bit install
             install_dirs = {'OSGeo4W': "C:\\OSGeo4W64",
                             'SNAP': "C:\\Program Files\\SNAP",
-                            'R': "C:\\Program Files\\R\\R-4.0.2"}
+                            'R': "C:\\Program Files\\R\\R-3.3.3"}
 
             # select installation files for 64 bit install
             installationsDir = 'Installations_x64'
             _joinbindir = functools.partial(os.path.join, installationsDir)
             osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
-            snapInstall = [_joinbindir('esa-snap_sentinel_windows-x64_7_0.exe'), '-q',
+            snapInstall = [_joinbindir('esa-snap_sentinel_windows-x64_8_0.exe'), '-q',
                            '-varfile', 'SNAP_response_install4j.varfile',
                            '-splash', '"SNAP installation"']
-            rInstall = _joinbindir("R-4.0.2-win.exe")
+            rInstall = _joinbindir("R-3.3.3-win.exe")
 
         elif res == CANCEL:
             del self.dialog
