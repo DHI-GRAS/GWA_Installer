@@ -376,17 +376,19 @@ class Utilities(QtCore.QObject):
         if not os.path.isfile(requirements_file):
             self.error_exit('No requirements file found in {}'.format(requirements_file))
         osgeo_envbat = os.path.join(osgeo_root, 'bin', 'o4w_env.bat')
+        py3_envbat = os.path.join(osgeo_root, 'bin', 'py3_env.bat')
         if not os.path.isfile(osgeo_envbat):
             raise self.error_exit('No OSGeo env bat file found in {}'.format(osgeo_envbat))
         cmd = (
-            'call {osgeo_envbat} & '
+            'call {osgeo_envbat} & call {py3_envbat} &'
             'if defined OSGEO4W_ROOT '
             '('
-            'python -m pip install --no-index --find-links "{package_dir}" '
+            'python3 -m pip install --no-index --find-links "{package_dir}" '
             '-r "{requirements_file}"'
             ')'
             .format(
                 osgeo_envbat=osgeo_envbat,
+                py3_envbat = py3_envbat,
                 package_dir=package_dir,
                 requirements_file=requirements_file))
         kwargs = dict(shell=True, notify=True)
