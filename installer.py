@@ -106,7 +106,7 @@ class Installer():
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
             install_dirs['OSGeo4W'] = str(self.dialog.dirPathText.toPlainText())
-            qgis_profile_path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "QGIS"
+            qgis_profile_path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "QGIS",
                                              "QGIS3", "profiles", "default")
 
             QGIS_extras_dir = os.path.abspath("QGIS additional software")
