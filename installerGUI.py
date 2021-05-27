@@ -117,7 +117,7 @@ class installerBaseWindow():
         if MainWindow:
             self.MainWindow = MainWindow
         else:
-            self.MainWindow = QtGui.QDialog()
+            self.MainWindow = QtWidgets.QDialog()
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main_ico'])),
                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -143,8 +143,8 @@ class installerWelcomeWindow(installerBaseWindow, welcomeDialog.Ui_Dialog):
         self.setupUi(self.MainWindow)
         self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
-        QtCore.QObject.connect(self.beginButton, QtCore.SIGNAL("clicked()"), self.next)
-        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
+        self.beginButton.clicked.connect(self.next)
+        self.cancelButton.clicked.connect(self.cancel)
         self.beginButton.setFocus()
 
 
@@ -155,9 +155,9 @@ class installWindow(installerBaseWindow, installComponentDialog.Ui_Dialog):
         self.setupUi(self.MainWindow)
         self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
-        QtCore.QObject.connect(self.installButton, QtCore.SIGNAL("clicked()"), self.next)
-        QtCore.QObject.connect(self.skipButton, QtCore.SIGNAL("clicked()"), self.skip)
-        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
+        self.installButton.clicked.connect(self.next)
+        self.skipButton.clicked.connect(self.skip)
+        self.cancelButton.clicked.connect(self.cancel)
         self.installButton.setFocus()
 
 
@@ -168,11 +168,10 @@ class postInstallWindow(installerBaseWindow, postInstallComponentDialog.Ui_Dialo
         self.setupUi(self.MainWindow)
         self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
-        QtCore.QObject.connect(self.continueButton, QtCore.SIGNAL("clicked()"), self.next)
-        QtCore.QObject.connect(self.skipButton, QtCore.SIGNAL("clicked()"), self.skip)
-        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
-        QtCore.QObject.connect(self.dirSelectionButton, QtCore.SIGNAL("clicked()"),
-                               self.dirSelection)
+        self.continueButton.clicked.connect(self.next)
+        self.skipButton.clicked.connect(self.skip)
+        self.cancelButton.clicked.connect(self.cancel)
+        self.dirSelectionButton.clicked.connect(self.dirSelection)
         self.continueButton.setFocus()
 
     def dirSelection(self):
@@ -191,8 +190,8 @@ class instructionsWindow(installerBaseWindow, componentInstructionsDialog.Ui_Dia
         self.setupUi(self.MainWindow)
         self.logoLabel.setPixmap(QtGui.QPixmap(_fromUtf8(LOGOS['main'])))
 
-        QtCore.QObject.connect(self.continueButton, QtCore.SIGNAL("clicked()"), self.next)
-        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
+        self.continueButton.clicked.connect(self.next)
+        self.cancelButton.clicked.connect(self.cancel)
         self.continueButton.setFocus()
 
 

@@ -167,7 +167,6 @@ class Installer():
         else:
             self.unknownActionPopup()
 
-
         ########################################################################
         # Install Snap Toolbox
 
@@ -284,6 +283,21 @@ class Installer():
             return
         else:
             self.unknownActionPopup()
+
+        # Finish
+        self.dialog = finishWindow()
+        self.showDialog()
+        del self.dialog
+
+    def showDialog(self):
+        return(self.dialog.exec_())
+
+    def unknownActionPopup(self):
+        msgBox = QtWidgets.QMessageBox()
+        msgBox.setText(
+            "Unknown action chosen in the previous installation step. "
+            "Ask the developer to check the installation script!\n\n Quitting installation")
+        msgBox.exec_()
 
 
 ##########################################
@@ -555,12 +569,13 @@ if __name__ == '__main__':
         installer = Installer(logfile=logfile)
 
         # Fix to make sure that runInstaller is executed in the app event loop
+        @QtCore.pyqtSlot()
         def _slot_installer():
-            QtCore.SLOT(installer.runInstaller())
+            installer.runInstaller()
 
         QtCore.QTimer.singleShot(200, _slot_installer)
 
         app.exec_()
     except:
-        logger.exception()
+        logger.exception("Main")
         raise
