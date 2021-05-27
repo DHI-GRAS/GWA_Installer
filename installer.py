@@ -41,7 +41,9 @@ def _set_logfile_handler():
 class Installer():
 
     def __init__(self, logfile):
-        self.util = Utilities(logfile)
+        self.qgis_profile_path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming",
+                                              "QGIS", "QGIS3", "profiles", "default")
+        self.util = Utilities(self.qgis_profile_path, logfile)
 
     def runInstaller(self):
         ########################################################################
@@ -106,24 +108,21 @@ class Installer():
         # copy plugins, scripts, and models and activate processing providers
         if res == NEXT:
             install_dirs['OSGeo4W'] = str(self.dialog.dirPathText.toPlainText())
-            qgis_profile_path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "QGIS",
-                                             "QGIS3", "profiles", "default")
 
             QGIS_extras_dir = os.path.abspath("QGIS additional software")
             # copy the plugins
-            dstPath = os.path.join(qgis_profile_path, "python", "plugins")
+            dstPath = os.path.join(self.qgis_profile_path, "python", "plugins")
             srcPath = os.path.join(QGIS_extras_dir, "plugins", "plugins.zip")
             # try to delete old plugins before copying the new ones to avoid conflicts
             plugins_to_delete = [
-                'mikecprovider',
-                'processing',
-                'processing_gpf',
-                'photo2shape',
-                'processing_workflow',
+                'LecoS',
                 'openlayers_plugin',
-                'pointsamplingtool',
+                'pointsamplingtool'
+                'processing_gpf',
+                'processing_workflow',
+                'processing-r',
                 'temporalprofiletool',
-                'valuetool']
+                'ThRasE']
             for plugin in plugins_to_delete:
                 self.util.deleteDir(
                     os.path.join(dstPath, plugin))
@@ -131,7 +130,7 @@ class Installer():
             self.showDialog()
 
             # copy scripts and models
-            processing_dir = os.path.join(qgis_profile_path, "processing")
+            processing_dir = os.path.join(self.qgis_profile_path, "processing")
             processing_packages = glob.glob(os.path.join(QGIS_extras_dir, '*.zip'))
             logger.info('Found processing packages: %s', processing_packages)
             for zipfname in processing_packages:
@@ -306,11 +305,12 @@ class Installer():
 class Utilities(QtCore.QObject):
     finished = QtCore.pyqtSignal()
 
-    def __init__(self, logfile):
+    def __init__(self, qgis_profile_path, logfile):
 
         QtCore.QObject.__init__(self)
         # QGIS and processing settings
-        self.qsettings = QtCore.QSettings("QGIS", "QGIS2")
+        self.qsettings = QtCore.QSettings(os.path.join(qgis_profile_path, "QGIS", "QGIS3.ini"),
+                                          QtCore.QSettings.IniFormat)
         # logging
         self.logfile = logfile
 
@@ -505,23 +505,20 @@ class Utilities(QtCore.QObject):
 
     def activatePlugins(self):
         self.activateThis(
-            "PythonPlugins/processing_workflow",
+            "PythonPlugins/LecoS",
             "PythonPlugins/openlayers_plugin",
-            "PythonPlugins/photo2shape",
             "PythonPlugins/pointsamplingtool",
-            "PythonPlugins/processing",
+            "PythonPlugins/processing_gpf",
+            "PythonPlugins/processing_workflow",
             "PythonPlugins/temporalprofiletool",
-            "PythonPlugins/valuetool",
-            "plugins/zonalstatisticsplugin")
+            "plugins/ThRasE")
 
     def activateProcessingProviders(self, osgeodir):
         self.setQGISSettings("Processing/configuration/ACTIVATE_GRASS70", "true")
         self.activateThis(
             "Processing/configuration/ACTIVATE_MODEL",
-            "Processing/configuration/ACTIVATE_OTB",
             "Processing/configuration/ACTIVATE_QGIS",
             "Processing/configuration/ACTIVATE_SAGA",
-            "Processing/configuration/ACTIVATE_DHIGRAS",
             "Processing/configuration/ACTIVATE_SCRIPT",
             "Processing/configuration/ACTIVATE_WORKFLOW",
             "Processing/configuration/ACTIVATE_GWA_TBX",
@@ -556,7 +553,7 @@ class Utilities(QtCore.QObject):
 
     def activateRplugin(self, dirPath, use64):
         self.activateThis(
-            "Processing/configuration/ACTIVATE_R")
+            "PythonPlugins/processing-r")
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
 
