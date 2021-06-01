@@ -1,2 +1,2 @@
-pyinstaller installer.py -F -w -i GWA.ico --uac-admin 
+pyinstaller installer.py --clean -F -w -i GWA.ico --uac-admin 
 cp build\installer.exe.manifest dist\
