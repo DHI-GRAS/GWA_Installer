@@ -553,7 +553,7 @@ class Utilities(QtCore.QObject):
 
     def activateRplugin(self, dirPath, use64):
         self.activateThis(
-            "PythonPlugins/processing-r")
+            "PythonPlugins/processing_r")
         self.setQGISSettings("Processing/configuration/R_FOLDER", dirPath)
         self.setQGISSettings("Processing/configuration/R_USE64", use64)
 
