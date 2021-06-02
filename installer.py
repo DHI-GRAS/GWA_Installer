@@ -62,6 +62,7 @@ class Installer():
             installationsDir = 'Installations_x64'
             _joinbindir = functools.partial(os.path.join, installationsDir)
             osgeo4wInstall = _joinbindir("osgeo4w-setup.bat")
+            otbInstall = _joinbindir("OTB-7.3.0-Win64.zip")
             snapInstall = [_joinbindir('esa-snap_sentinel_windows-x64_8_0.exe'), '-q',
                            '-varfile', 'SNAP_response_install4j.varfile',
                            '-splash', '"SNAP installation"']
@@ -82,7 +83,7 @@ class Installer():
             return
 
         ########################################################################
-        # Install OSGeo4W (QGIS, SAGA, GRASS)
+        # Install OSGeo4W (QGIS, SAGA, GRASS) and OTB
 
         # Define RAM fraction to use (SNAP and BEAM)
         ram_fraction = 0.6
@@ -93,6 +94,10 @@ class Installer():
         # run the OSGeo4W installation here as an outside process
         if res == NEXT:
             self.util.execSubprocess(osgeo4wInstall)
+            self.dialog = extractingWaitWindow(self.util,
+                                               otbInstall,
+                                               os.path.join(install_dirs["OSGeo4W"], "apps"))
+            self.showDialog()
         elif res == SKIP:
             pass
         elif res == CANCEL:
@@ -416,7 +421,7 @@ class Utilities(QtCore.QObject):
                     "No files were copied.")
                 return
 
-        # checkWritePremissions alsoe creates the directory if it doesn't exist yet
+        # checkWritePremissions also creates the directory if it doesn't exist yet
         if not self.checkWritePermissions(dstPath):
             self.error_exit(
                 "You do not have permissions to write to destination directory!\n\n "
@@ -511,8 +516,9 @@ class Utilities(QtCore.QObject):
             "Processing/configuration/ACTIVATE_SCRIPT",
             "Processing/configuration/ACTIVATE_WORKFLOW",
             "Processing/configuration/ACTIVATE_GWA_TBX",
-            "Processing/configuration/GRASS7_LOG_COMMANDS",
-            "Processing/configuration/GRASS7_LOG_CONSOLE",
+            "Processing/Configuration/OTB_ACTIVATE",
+            "Processing/configuration/GRASS_LOG_COMMANDS",
+            "Processing/configuration/GRASS_LOG_CONSOLE",
             "Processing/configuration/SAGA_LOG_COMMANDS",
             "Processing/configuration/SAGA_LOG_CONSOLE",
             "Processing/configuration/USE_FILENAME_AS_LAYER_NAME",
@@ -522,13 +528,22 @@ class Utilities(QtCore.QObject):
         try:
             grass_root = os.path.join(osgeodir, 'apps', 'grass')
             grass_folders = sorted([
-                d for d in glob.glob(os.path.join(grass_root, 'grass-*'))
+                d for d in glob.glob(os.path.join(grass_root, 'grass*'))
                 if os.path.isdir(d)])
             grassFolder = grass_folders[-1]
-            self.setQGISSettings("Processing/configuration/GRASS7_FOLDER", grassFolder)
-            self.setQGISSettings("Processing/configuration/GRASS7_HELP_PATH",
-                                 os.path.join(grassFolder, "docs", "html"))
-        except (IndexError, OSError):
+            # OSGeo4W puts GRASS in folder called grass7x but QGIS does not work unless both
+            # grass7x and grass-7.x exist. Therefore make a copy.
+            if "grass-" not in grassFolder:
+                correctGrassFolder = grassFolder.replace("grass7", "grass-7.")
+                cmd = f"Xcopy /E /I {grassFolder} {correctGrassFolder}"
+                dialog = cmdWaitWindow(self, cmd)
+                dialog.exec_()
+
+            otb_folder = glob.glob(os.path.join(osgeodir, "apps", "OTB-*"))[0]
+            self.setQGISSettings("Processing/Configuration/OTB_FOLDER", otb_folder)
+            self.setQGISSettings("Processing/Configuration/OTB_APP_FOLDER",
+                                 os.path.join(otb_folder, "lib", "otb", "applications"))
+        except (ValueError):
             pass
 
     def activateSNAPplugin(self, dirPath):
