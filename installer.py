@@ -177,28 +177,17 @@ class Installer():
             self.util.execSubprocess(snapInstall)
 
             # Configure snappy
+            jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
+            replace = {
+                'java_home': 'r"{}"'.format(os.path.join(install_dirs['SNAP'], "jre").replace("\\", "\\\\")),
+                'jvm_dll': 'r"{}"'.format(os.path.join(install_dirs['SNAP'], "jre", "jre", "bin", "server", "jvm.dll").replace("\\", "\\\\"))}
+            installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
+            
             site_packages_dir = os.path.join(
-                install_dirs['OSGeo4W'], 'apps', 'Python37', 'Lib', 'site-packages')
+                install_dirs['OSGeo4W'], 'apps', 'Python37', 'lib', 'site-packages')
             osgeopython = os.path.join(install_dirs['OSGeo4W'], 'bin', 'python-qgis-ltr.bat')
             self.util.execSubprocess([os.path.join(install_dirs['SNAP'], "bin", "snap64.exe"),
                                      "--nogui", "--python", osgeopython, site_packages_dir])
-
-            jpyconfig = os.path.join(site_packages_dir, 'jpyconfig.py')
-            replace = {
-                'java_home': '"{}"'.format(os.path.join(install_dirs['SNAP'], 'jre')),
-                'jvm_dll': 'None'}
-            installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
-
-            # Copy jpy files into snappy directory, otherwise snappy does not work. This is just
-            # a quick fix.
-            for name in [
-                    'jpy.pyd', 'jpy-*.jar', 'jpyconfig.properties', 'jpyconfig.py', 'jpyutil.py',
-            ]:
-                paths = glob.glob(os.path.join(site_packages_dir, name))
-                if not paths:
-                    logger.warn('No files found for JPY file pattern "{}".'.format(name))
-                for path in paths:
-                    shutil.copy(path, os.path.join(site_packages_dir, 'snappy'))
 
             # Set ammount of memory to be used with SNAP
             java_max_mem = installer_utils.get_total_ram() * ram_fraction
