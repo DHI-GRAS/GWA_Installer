@@ -187,7 +187,7 @@ class Installer():
                 'java_home': 'r"{}"'.format(os.path.join(install_dirs['SNAP'], "jre").replace("\\", "\\\\")),
                 'jvm_dll': 'r"{}"'.format(os.path.join(install_dirs['SNAP'], "jre", "jre", "bin", "server", "jvm.dll").replace("\\", "\\\\"))}
             installer_utils.fix_jpyconfig(jpyconfig, replace=replace)
-            
+
             site_packages_dir = os.path.join(
                 install_dirs['OSGeo4W'], 'apps', 'Python37', 'lib', 'site-packages')
             osgeopython = os.path.join(install_dirs['OSGeo4W'], 'bin', 'python-qgis-ltr.bat')
@@ -500,11 +500,10 @@ class Utilities(QtCore.QObject):
     def activatePlugins(self):
         self.activateThis(
             "PythonPlugins/LecoS",
-            "PythonPlugins/openlayers_plugin",
+            "PythonPlugins/quick_map_services",
             "PythonPlugins/pointsamplingtool",
             "PythonPlugins/processing_gpf",
             "PythonPlugins/processing_workflow",
-            "PythonPlugins/temporalprofiletool",
             "plugins/ThRasE")
 
     def activateProcessingProviders(self, osgeodir):
